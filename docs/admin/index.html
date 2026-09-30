@@ -1,0 +1,3271 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1119" />
+    <title>Kontroll • I-Squared Statsbygg</title>
+    <style>
+      /* Felles designtokens – videreført fra prototypen */
+:root {
+  --north: #55c8ff;
+  --north-deep: #0b5b80;
+  --south: #ff654f;
+  --south-deep: #7c251c;
+  --gold: #ffd166;
+  --green: #57d68d;
+  --bg: #07111c;
+  --bg-2: #0b1119;
+  --panel: rgba(7, 18, 31, 0.9);
+  --panel-solid: #131d29;
+  --line: #26374b;
+  --text: #f7fbff;
+  --muted: #a9bacb;
+  --focus: #ffd166;
+  --radius: 16px;
+  --font: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.north {
+  color: var(--north);
+}
+.south {
+  color: var(--south);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+      /* Mobil kontrollflate – mobil først, store trykkflater, én hånd */
+body {
+  min-height: 100vh;
+  background: var(--bg-2);
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(11, 17, 25, 0.97);
+  border-bottom: 1px solid var(--line);
+  padding: max(10px, env(safe-area-inset-top)) 12px 10px;
+}
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.topTitle {
+  font-weight: 950;
+  font-size: 16px;
+}
+.conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  display: inline-block;
+}
+.dot.off {
+  background: var(--south);
+}
+.dot.warn {
+  background: var(--gold);
+}
+.chips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+.chip {
+  background: #0d1621;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 8px;
+  min-width: 0;
+}
+.chip .k {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.chip .v {
+  display: block;
+  font-weight: 900;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip .v.timerV {
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+}
+.chip.warn .v {
+  color: var(--gold);
+}
+.chip.danger .v {
+  color: var(--south);
+}
+main {
+  padding: 12px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.tab {
+  display: none;
+}
+.tab.active {
+  display: block;
+}
+h2 {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 4px 8px;
+}
+h2:first-child {
+  margin-top: 4px;
+}
+.card {
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.grid3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.grid1 {
+  grid-template-columns: 1fr;
+}
+.span2 {
+  grid-column: span 2;
+}
+.btn {
+  min-height: 56px;
+  border: 1px solid #395069;
+  border-radius: 12px;
+  background: #203044;
+  color: #fff;
+  padding: 10px 12px;
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1.2;
+  cursor: pointer;
+  width: 100%;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+.btn:active {
+  filter: brightness(1.25);
+}
+.btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn.busy {
+  position: relative;
+  cursor: progress;
+  outline: 3px solid var(--gold);
+  outline-offset: -3px;
+}
+.btn.busy::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 50%;
+  border: 3px solid #ffffff55;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.btn.blue {
+  background: var(--north-deep);
+  border-color: var(--north);
+}
+.btn.red {
+  background: var(--south-deep);
+  border-color: var(--south);
+}
+.btn.gold {
+  background: #725c10;
+  border-color: var(--gold);
+}
+.btn.green {
+  background: #17633c;
+  border-color: var(--green);
+}
+.btn.danger {
+  background: #4a1414;
+  border-color: #ff4d4d;
+}
+.btn.ghost {
+  background: transparent;
+}
+.btn.on {
+  outline: 3px solid var(--gold);
+  outline-offset: -3px;
+}
+.btn.big {
+  min-height: 72px;
+  font-size: 18px;
+}
+.btn small {
+  display: block;
+  font-weight: 600;
+  font-size: 12px;
+  color: #d3dde6;
+  margin-top: 3px;
+}
+.next {
+  border-color: var(--gold);
+  background: linear-gradient(160deg, #1d2533, #131d29);
+}
+.next .now {
+  font-size: 13px;
+  color: var(--muted);
+}
+.next .now b {
+  color: #fff;
+}
+.seg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.seg .btn {
+  min-height: 48px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 13px;
+}
+.pill {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #26374b;
+}
+.pill.open {
+  background: #17633c;
+}
+.pill.closed {
+  background: #4a2a36;
+}
+.pill.pending {
+  background: #725c10;
+}
+.pill.approved {
+  background: #0b5b80;
+}
+.bigTimer {
+  font-size: 72px;
+  font-weight: 950;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  margin: 4px 0 10px;
+  letter-spacing: -0.04em;
+}
+.bigTimer.warn {
+  color: var(--gold);
+}
+.bigTimer.danger,
+.bigTimer.done {
+  color: var(--south);
+}
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 10px 0 4px;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0d1621;
+  color: #fff;
+  font-size: 16px;
+}
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  color: var(--text);
+  font-size: 15px;
+  margin: 0;
+}
+.check input {
+  width: 24px;
+  min-height: 24px;
+  height: 24px;
+}
+.pollRow {
+  display: grid;
+  gap: 8px;
+}
+.pollHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.pollHead b {
+  font-size: 15px;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+}
+.bars {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+.bars div {
+  display: grid;
+  grid-template-columns: 84px 1fr 40px;
+  gap: 8px;
+  align-items: center;
+}
+.bars i {
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  background: #57d68d;
+}
+.bars .against i {
+  background: #e05d6f;
+}
+.bars .neutral i {
+  background: #9aa9b8;
+}
+.warnBox {
+  border: 1px solid var(--gold);
+  background: #2b2410;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 10px 0;
+  line-height: 1.4;
+}
+.okBox {
+  border: 1px solid var(--green);
+  background: #10281b;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 10px 0;
+}
+.score {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  text-align: center;
+}
+.score .n {
+  font-size: 44px;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+}
+.cardBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+.cardBtn .ic {
+  font-size: 28px;
+}
+.cardBtn.used {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+.qrs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.qrItem {
+  background: #fff;
+  color: #000;
+  border-radius: 12px;
+  padding: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+.qrItem svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.qrItem a {
+  color: #0b5b80;
+  word-break: break-all;
+  font-weight: 600;
+}
+.log {
+  font-size: 12px;
+  line-height: 1.5;
+  max-height: 260px;
+  overflow: auto;
+  font-family: ui-monospace, Menlo, monospace;
+  color: #c9d5df;
+}
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: rgba(11, 17, 25, 0.98);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  min-height: 62px;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.tabbar button .i {
+  font-size: 20px;
+}
+.tabbar button[aria-selected='true'] {
+  color: #fff;
+  background: #16222f;
+  box-shadow: inset 0 3px 0 var(--gold);
+}
+.toast {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 30;
+  background: #3b1111;
+  border: 1px solid #ff654f;
+  color: #ffe1db;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: none;
+  max-width: 696px;
+  margin: 0 auto;
+}
+.toast.ok {
+  background: #10281b;
+  border-color: var(--green);
+  color: #dfffea;
+}
+.toast.show {
+  display: block;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #000b;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+}
+.modal.show {
+  display: flex;
+}
+.modal .box {
+  width: 100%;
+  max-width: 520px;
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: env(safe-area-inset-bottom);
+}
+.modal h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+.modal p {
+  color: #d2dce5;
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+#login {
+  max-width: 420px;
+  margin: 12vh auto 0;
+  padding: 20px;
+}
+#login h1 {
+  font-size: 26px;
+  margin: 0 0 6px;
+}
+@media (min-width: 700px) {
+  .grid.wide3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.nextLabel {
+  margin: 8px 0 10px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+.nextLabel b {
+  font-size: 17px;
+}
+#nextBtn {
+  min-height: 84px;
+  font-size: 24px;
+  letter-spacing: 0.06em;
+}
+.cueList summary {
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 32px;
+}
+.cueList ol {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.cue {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0d1621;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.cue .st {
+  flex: 0 0 28px;
+  font-weight: 900;
+  color: var(--gold);
+  text-align: right;
+}
+.cue.done {
+  opacity: 0.5;
+}
+.cue.current {
+  border-color: var(--gold);
+  background: #2b2410;
+}
+.bigTimer.over {
+  color: var(--south);
+}
+
+    </style>
+    <script src="../config.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>window.ISQ_BOOT = Object.assign({}, window.ISQ_CONFIG || {}, { page: "admin", poll: (function () { try { var p = new URLSearchParams(location.search).get('poll'); return p && /^[a-z0-9-]{1,20}$/.test(p) ? p : null; } catch (e) { return null; } })() });</script>
+  </head>
+  <body>
+    <section id="login" hidden>
+      <h1>Kontrollflate</h1>
+      <p class="muted" id="loginTitle">I-Squared Statsbygg</p>
+      <form id="loginForm" class="card" autocomplete="off">
+        <label for="pin">Administrator-PIN</label>
+        <input id="pin" name="pin" type="password" autocomplete="current-password" required minlength="1" />
+        <div style="height: 12px"></div>
+        <button class="btn big blue" type="submit" id="loginBtn">Logg inn</button>
+        <p id="loginErr" class="small" role="alert" style="color: #ffb4a6"></p>
+      </form>
+    </section>
+
+    <div id="app" hidden>
+      <header class="top">
+        <div class="topRow">
+          <div class="topTitle" id="appTitle">I-Squared • Kontroll</div>
+          <div class="conn" role="status" aria-live="polite">
+            <span class="dot" id="connDot" aria-hidden="true"></span><span id="connText">Tilkoblet</span>
+          </div>
+        </div>
+        <div class="chips">
+          <div class="chip"><span class="k">Skjerm</span><span class="v" id="chipView">–</span></div>
+          <div class="chip"><span class="k">Påstand</span><span class="v" id="chipStatement">–</span></div>
+          <div class="chip" id="chipTimerBox"><span class="k" id="chipTimerK">Timer</span><span class="v timerV" id="chipTimer">–</span></div>
+          <div class="chip"><span class="k">Avstemning</span><span class="v" id="chipPoll">–</span></div>
+          <div class="chip"><span class="k">Stemmer</span><span class="v num" id="chipVotes">0</span></div>
+          <div class="chip"><span class="k">Nord – Sør</span><span class="v num" id="chipScore">0 – 0</span></div>
+        </div>
+      </header>
+
+      <main>
+        <section class="tab active" id="tab-run" role="tabpanel" aria-labelledby="t-run"></section>
+        <section class="tab" id="tab-poll" role="tabpanel" aria-labelledby="t-poll"></section>
+        <section class="tab" id="tab-timer" role="tabpanel" aria-labelledby="t-timer"></section>
+        <section class="tab" id="tab-cards" role="tabpanel" aria-labelledby="t-cards"></section>
+        <section class="tab" id="tab-results" role="tabpanel" aria-labelledby="t-results"></section>
+        <section class="tab" id="tab-media" role="tabpanel" aria-labelledby="t-media"></section>
+        <section class="tab" id="tab-admin" role="tabpanel" aria-labelledby="t-admin"></section>
+      </main>
+
+      <nav class="tabbar" role="tablist" aria-label="Seksjoner">
+        <button id="t-run" role="tab" data-tab="run" aria-selected="true" aria-label="Kjøreplan" title="Kjøreplan"><span class="i" aria-hidden="true">▶︎</span>PLAN</button>
+        <button id="t-poll" role="tab" data-tab="poll" aria-selected="false" aria-label="Avstemning" title="Avstemning"><span class="i" aria-hidden="true">🗳</span>AVSTEM</button>
+        <button id="t-timer" role="tab" data-tab="timer" aria-selected="false" aria-label="Timer" title="Timer"><span class="i" aria-hidden="true">⏱</span>TIMER</button>
+        <button id="t-cards" role="tab" data-tab="cards" aria-selected="false" aria-label="Spillekort" title="Spillekort"><span class="i" aria-hidden="true">🟨</span>KORT</button>
+        <button id="t-results" role="tab" data-tab="results" aria-selected="false" aria-label="Resultater" title="Resultater"><span class="i" aria-hidden="true">🏆</span>RESULTAT</button>
+        <button id="t-media" role="tab" data-tab="media" aria-selected="false" aria-label="Media" title="Media"><span class="i" aria-hidden="true">🎬</span>MEDIA</button>
+        <button id="t-admin" role="tab" data-tab="admin" aria-selected="false" aria-label="Admin" title="Admin"><span class="i" aria-hidden="true">⚙︎</span>ADMIN</button>
+      </nav>
+
+      <div id="toast" class="toast" role="alert"></div>
+
+      <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="box">
+          <h3 id="modalTitle">Bekreft</h3>
+          <p id="modalText"></p>
+          <div id="modalExtra"></div>
+          <div class="grid" style="margin-top: 12px">
+            <button class="btn ghost" type="button" id="modalCancel">Avbryt</button>
+            <button class="btn danger" type="button" id="modalOk">Bekreft</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // @ts-check
+/**
+ * Seed-data og faste definisjoner for I-Squared Statsbygg.
+ * Kjører i Apps Script (global), i nettleseren (global) og i Node (module.exports).
+ */
+var ISQ_Config = (function () {
+  'use strict';
+
+  var CHOICES = ['against', 'neutral', 'for'];
+  var CHOICE_LABELS = { against: 'MOT', neutral: 'NØYTRAL', for: 'FOR' };
+  /** Skala for netto flyttede stemmesteg. */
+  var CHOICE_VALUE = { against: 0, neutral: 1, for: 2 };
+
+  var TEAMS = ['north', 'south'];
+
+  var CARDS = [
+    { key: 'yellow', icon: '🟨', title: 'PASS', name: 'Gult kort', text: 'Laget slipper å svare.' },
+    { key: 'red', icon: '🟥', title: 'INNSIGELSE', name: 'Rødt kort', text: 'Laget avbryter med en kort innsigelse.' },
+    { key: 'green', icon: '🟩', title: 'EKSTRATID', name: 'Grønt kort', text: 'Laget får ett ekstra minutt.' },
+    { key: 'english', icon: '🇬🇧', title: 'ENGLISH, PLEASE', name: 'Britisk flagg', text: 'Svaret må gis på engelsk.' },
+    { key: 'yesno', icon: '❗', title: 'JA ELLER NEI', name: 'Utropstegn', text: 'Motstanderlaget må først svare ja eller nei.' }
+  ];
+
+  var VIEWS = [
+    'hero',
+    'mainQuestion',
+    'statement',
+    'qr',
+    'team',
+    'opening',
+    'cross',
+    'closing',
+    'result',
+    'leaderboard',
+    'mainResult',
+    'winner',
+    'rules',
+    'video',
+    'black'
+  ];
+
+  var VIEW_LABELS = {
+    hero: 'Hero',
+    mainQuestion: 'Hovedspørsmål',
+    statement: 'Påstand',
+    qr: 'QR-kode / avstemning',
+    team: 'Lagpresentasjon',
+    opening: 'Åpningsinnlegg',
+    cross: 'Kryssforhør',
+    closing: 'Sluttappell',
+    result: 'Avstemningsresultat',
+    leaderboard: 'Leaderboard',
+    mainResult: 'Resultat hovedspørsmål',
+    winner: 'Vinner av debatten',
+    rules: 'Debattregler',
+    video: 'Video',
+    black: 'Svart skjerm'
+  };
+
+  /**
+   * Videoer spilles fra den lokale publikumsskjerm-mappen på Mac-en.
+   * returnTo: hvor skjermen går når videoen er ferdig (null = visningen før videoen).
+   */
+  var VIDEOS = [
+    { key: 'introNorth', label: 'Introvideo Lag Nord', file: 'media/video/Introvideonord.mp4', team: 'north', returnTo: null },
+    { key: 'introSouth', label: 'Introvideo Lag Sør', file: 'media/video/Introvideosør.mp4', team: 'south', returnTo: { view: 'statement', statementNo: 1 } },
+    {
+      key: 'extra1',
+      label: 'Ekstravideo påstand 1',
+      file: 'media/video/ekstravideopåstand1.mp4',
+      statement: 1,
+      returnTo: { view: 'statement', statementNo: 1 }
+    },
+    {
+      key: 'extra2',
+      label: 'Ekstravideo påstand 2',
+      file: 'media/video/ekstravideopåstand2.mp4',
+      statement: 2,
+      returnTo: { view: 'statement', statementNo: 2 }
+    },
+    {
+      key: 'extra3',
+      label: 'Ekstravideo påstand 3',
+      file: 'media/video/ekstravideopåstand3.mp4',
+      statement: 3,
+      returnTo: { view: 'statement', statementNo: 3 }
+    }
+  ];
+
+  /** Debattdeler: varighet styres i innstillingene; overtime = timeren fortsetter i minus. */
+  var SEGMENTS = {
+    opening: { label: 'Åpningsinnlegg', overtime: true, autoReturn: false },
+    cross: { label: 'Kryssforhør', overtime: true, autoReturn: false },
+    closing: { label: 'Sluttappell', overtime: false, autoReturn: true }
+  };
+  /** Sekunder «TID» vises før sluttappellen går automatisk tilbake til påstanden. */
+  var AUTO_RETURN_GRACE_MS = 2000;
+
+  var MUSIC = [
+    { key: 'walkon', label: 'Innmarsj', file: 'media/music/innmarsj.mp3' },
+    { key: 'break', label: 'Pausemusikk', file: 'media/music/pause.mp3' }
+  ];
+
+  var POLL_IDS = ['main-before', 'main-after', 's1-before', 's1-after', 's2-before', 's2-after', 's3-before', 's3-after'];
+
+  var STATUSES = [
+    'setup',
+    'intro',
+    'main_poll_before',
+    'team_introduction',
+    'statement_1_before_poll',
+    'statement_1_debate',
+    'statement_1_after_poll',
+    'statement_1_result',
+    'statement_2_before_poll',
+    'statement_2_debate',
+    'statement_2_after_poll',
+    'statement_2_result',
+    'statement_3_before_poll',
+    'statement_3_debate',
+    'statement_3_after_poll',
+    'statement_3_result',
+    'main_poll_after',
+    'final_result',
+    'completed'
+  ];
+
+  var DEFAULT_SLUG = 'i-squared-statsbygg';
+
+  /** @returns {any} et nytt arrangementsdokument med seed-data */
+  function seedDocument() {
+    var polls = {};
+    POLL_IDS.forEach(function (id) {
+      var parts = id.split('-');
+      var isMain = parts[0] === 'main';
+      polls[id] = {
+        id: id,
+        type: isMain ? 'main' : 'statement',
+        statementNo: isMain ? null : Number(parts[0].slice(1)),
+        phase: parts[1],
+        status: 'draft',
+        openedAt: null,
+        closedAt: null
+      };
+    });
+    return {
+      schemaVersion: 4,
+      version: 1,
+      event: {
+        slug: DEFAULT_SLUG,
+        title: 'I-Squared Statsbygg',
+        heroTitle: 'I-Squared',
+        kicker: 'Statsbygg presenterer',
+        mainQuestion:
+          'Vil den nye styrings- og leveransemodellen modernisere vår digitale utvikling, eller blir den en PowerPoint-presentasjon uten reell praktisk effekt?',
+        mainLabels: { against: 'POWERPOINT', neutral: 'USIKKER', for: 'MODERNISERING' },
+        status: 'setup',
+        demoMode: false,
+        settings: {
+          soundEnabled: true,
+          autoStartTimer: true,
+          requireEqualTurnout: false,
+          durations: { opening: 180, cross: 240, closing: 60, team: 60 }
+        },
+        createdAt: null,
+        updatedAt: null
+      },
+      teams: {
+        north: { key: 'north', name: 'Lag Nord', color: '#55c8ff', image: 'media/images/lagnord.jpg' },
+        south: { key: 'south', name: 'Lag Sør', color: '#ff654f', image: 'media/images/lagsør.jpg' }
+      },
+      statements: [
+        {
+          no: 1,
+          short: 'Tjenester',
+          text: 'Statsbygg bør organisere digital utvikling rundt tjenester, ikke rundt organisasjonsstrukturen.',
+          northPosition: 'against',
+          southPosition: 'for'
+        },
+        {
+          no: 2,
+          short: 'Kontroll',
+          text: 'Den største hindringen for digital utvikling i Statsbygg er ikke teknologi, men ledere som ikke tør å gi fra seg kontroll.',
+          northPosition: 'against',
+          southPosition: 'for'
+        },
+        {
+          no: 3,
+          short: 'Kulturendring',
+          text: 'Den nye styrings- og leveransemodellen krever en kulturendring som Statsbygg ikke er klar for.',
+          northPosition: 'against',
+          southPosition: 'for'
+        }
+      ],
+      polls: polls,
+      state: {
+        view: 'hero',
+        previousView: 'hero',
+        activeStatement: 1,
+        activePollId: null,
+        cueIndex: -1,
+        qrPollId: null,
+        activeTeam: 'north',
+        segment: null,
+        revealDistribution: false,
+        resultStatement: null,
+        video: null,
+        music: null,
+        flash: null
+      },
+      timer: { status: 'idle', startedAt: null, durationSeconds: 180, pausedRemaining: null },
+      cards: [],
+      results: {}
+    };
+  }
+
+  return {
+    CHOICES: CHOICES,
+    CHOICE_LABELS: CHOICE_LABELS,
+    CHOICE_VALUE: CHOICE_VALUE,
+    TEAMS: TEAMS,
+    CARDS: CARDS,
+    VIEWS: VIEWS,
+    VIEW_LABELS: VIEW_LABELS,
+    VIDEOS: VIDEOS,
+    SEGMENTS: SEGMENTS,
+    AUTO_RETURN_GRACE_MS: AUTO_RETURN_GRACE_MS,
+    MUSIC: MUSIC,
+    POLL_IDS: POLL_IDS,
+    STATUSES: STATUSES,
+    DEFAULT_SLUG: DEFAULT_SLUG,
+    seedDocument: seedDocument
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = ISQ_Config;
+
+      // @ts-check
+/**
+ * Serverstyrt timer. Serveren lagrer kun startedAt, durationSeconds, status og
+ * pausedRemaining. Klientene regner ut gjenværende tid lokalt.
+ */
+var ISQ_Timer = (function () {
+  'use strict';
+
+  /** @typedef {{status:string, startedAt:number|null, durationSeconds:number, pausedRemaining:number|null}} TimerState */
+
+  /** @param {number} s */
+  function clampSeconds(s) {
+    var x = Number(s);
+    if (!isFinite(x) || x < 0) return 0;
+    return Math.min(x, 24 * 3600);
+  }
+
+  /** @param {TimerState} t @param {number} now @returns {number} millisekunder igjen */
+  function remainingMs(t, now) {
+    if (!t) return 0;
+    if (t.status === 'running' && t.startedAt != null) {
+      return Math.max(0, t.startedAt + t.durationSeconds * 1000 - now);
+    }
+    if (t.status === 'paused' && t.pausedRemaining != null) {
+      return Math.max(0, t.pausedRemaining * 1000);
+    }
+    return Math.max(0, (t.durationSeconds || 0) * 1000);
+  }
+
+  /**
+   * Som remainingMs, men kan bli negativ når tiden er ute (for debattdeler som går i minus).
+   * @param {TimerState} t @param {number} now
+   */
+  function signedRemainingMs(t, now) {
+    if (t && t.status === 'running' && t.startedAt != null) return t.startedAt + t.durationSeconds * 1000 - now;
+    return remainingMs(t, now);
+  }
+
+  /** Formaterer med minus foran når tiden er passert, f.eks. «−00:12». @param {number} seconds */
+  function formatSigned(seconds) {
+    if (seconds > -1) return format(Math.max(0, seconds));
+    return '−' + format(Math.floor(-seconds));
+  }
+
+  /** @param {number} seconds @returns {TimerState} */
+  function load(seconds) {
+    return { status: 'idle', startedAt: null, durationSeconds: clampSeconds(seconds), pausedRemaining: null };
+  }
+
+  /** @param {TimerState} t @param {number} now @param {number} [seconds] @returns {TimerState} */
+  function start(t, now, seconds) {
+    var d = seconds != null ? clampSeconds(seconds) : t.durationSeconds;
+    return { status: 'running', startedAt: now, durationSeconds: d, pausedRemaining: null };
+  }
+
+  /** @param {TimerState} t @param {number} now @returns {TimerState} */
+  function pause(t, now) {
+    if (t.status !== 'running') return t;
+    return {
+      status: 'paused',
+      startedAt: null,
+      durationSeconds: t.durationSeconds,
+      pausedRemaining: Math.round(remainingMs(t, now)) / 1000
+    };
+  }
+
+  /** @param {TimerState} t @param {number} now @returns {TimerState} */
+  function resume(t, now) {
+    if (t.status === 'paused') {
+      var rem = t.pausedRemaining || 0;
+      return {
+        status: 'running',
+        startedAt: now - (t.durationSeconds - rem) * 1000,
+        durationSeconds: t.durationSeconds,
+        pausedRemaining: null
+      };
+    }
+    if (t.status === 'idle') return start(t, now);
+    return t;
+  }
+
+  /** @param {TimerState} t @returns {TimerState} */
+  function reset(t) {
+    return load(t.durationSeconds);
+  }
+
+  /** @param {TimerState} t @param {number} deltaSeconds @param {number} now @returns {TimerState} */
+  function adjust(t, deltaSeconds, now) {
+    var d = Number(deltaSeconds) || 0;
+    if (t.status === 'running') {
+      var rem = remainingMs(t, now) / 1000;
+      var nextRem = Math.max(0, rem + d);
+      return {
+        status: 'running',
+        startedAt: t.startedAt,
+        durationSeconds: Math.max(0, t.durationSeconds + (nextRem - rem)),
+        pausedRemaining: null
+      };
+    }
+    if (t.status === 'paused') {
+      return {
+        status: 'paused',
+        startedAt: null,
+        durationSeconds: Math.max(0, t.durationSeconds + d),
+        pausedRemaining: Math.max(0, (t.pausedRemaining || 0) + d)
+      };
+    }
+    return load(Math.max(0, t.durationSeconds + d));
+  }
+
+  /** @param {number} seconds @returns {string} */
+  function format(seconds) {
+    var s = Math.max(0, Math.ceil(seconds - 1e-6));
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r;
+  }
+
+  /** Fargefase for publikumsskjermen. @param {number} seconds */
+  function phase(seconds) {
+    if (seconds <= 0) return 'done';
+    if (seconds <= 10) return 'danger';
+    if (seconds <= 30) return 'warn';
+    return 'normal';
+  }
+
+  return {
+    remainingMs: remainingMs,
+    signedRemainingMs: signedRemainingMs,
+    formatSigned: formatSigned,
+    load: load,
+    start: start,
+    pause: pause,
+    resume: resume,
+    reset: reset,
+    adjust: adjust,
+    format: format,
+    phase: phase
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = ISQ_Timer;
+
+      // @ts-check
+/**
+ * Selvstendig QR-kodegenerator (byte-modus, feilretting M, versjon 1–20).
+ * Genererer QR-koder direkte i nettleseren uten eksterne biblioteker.
+ */
+var ISQ_QR = (function () {
+  'use strict';
+
+  // [ecPerBlock, blocks1, data1, blocks2, data2] for feilrettingsnivå M
+  var EC_M = [
+    null,
+    [10, 1, 16, 0, 0],
+    [16, 1, 28, 0, 0],
+    [26, 1, 44, 0, 0],
+    [18, 2, 32, 0, 0],
+    [24, 2, 43, 0, 0],
+    [16, 4, 27, 0, 0],
+    [18, 4, 31, 0, 0],
+    [22, 2, 38, 2, 39],
+    [22, 3, 36, 2, 37],
+    [26, 4, 43, 1, 44],
+    [30, 1, 50, 4, 51],
+    [22, 6, 36, 2, 37],
+    [22, 8, 37, 1, 38],
+    [24, 4, 40, 5, 41],
+    [24, 5, 41, 5, 42],
+    [28, 7, 45, 3, 46],
+    [28, 10, 46, 1, 47],
+    [26, 9, 43, 4, 44],
+    [26, 3, 44, 11, 45],
+    [26, 3, 41, 13, 42]
+  ];
+
+  var ALIGN = [
+    null,
+    [],
+    [6, 18],
+    [6, 22],
+    [6, 26],
+    [6, 30],
+    [6, 34],
+    [6, 22, 38],
+    [6, 24, 42],
+    [6, 26, 46],
+    [6, 28, 50],
+    [6, 30, 54],
+    [6, 32, 58],
+    [6, 34, 62],
+    [6, 26, 46, 66],
+    [6, 26, 48, 70],
+    [6, 26, 50, 74],
+    [6, 30, 54, 78],
+    [6, 30, 56, 82],
+    [6, 30, 58, 86],
+    [6, 34, 62, 90]
+  ];
+
+  var EC_FORMAT_BITS_M = 0; // M = 00
+
+  // ---------- GF(256) ----------
+  var EXP = new Array(512);
+  var LOG = new Array(256);
+  (function initGf() {
+    var x = 1;
+    for (var i = 0; i < 255; i++) {
+      EXP[i] = x;
+      LOG[x] = i;
+      x <<= 1;
+      if (x & 0x100) x ^= 0x11d;
+    }
+    for (var j = 255; j < 512; j++) EXP[j] = EXP[j - 255];
+  })();
+
+  /** @param {number} a @param {number} b */
+  function gfMul(a, b) {
+    if (a === 0 || b === 0) return 0;
+    return EXP[LOG[a] + LOG[b]];
+  }
+
+  /** @param {number} degree @returns {number[]} */
+  function generator(degree) {
+    var g = [1];
+    for (var i = 0; i < degree; i++) {
+      var next = new Array(g.length + 1).fill(0);
+      for (var j = 0; j < g.length; j++) {
+        next[j] ^= g[j];
+        next[j + 1] ^= gfMul(g[j], EXP[i]);
+      }
+      g = next;
+    }
+    return g;
+  }
+
+  /** @param {number[]} data @param {number} ecLen @returns {number[]} */
+  function rsRemainder(data, ecLen) {
+    var gen = generator(ecLen);
+    var res = new Array(ecLen).fill(0);
+    for (var i = 0; i < data.length; i++) {
+      var factor = data[i] ^ res[0];
+      res.shift();
+      res.push(0);
+      for (var j = 0; j < ecLen; j++) res[j] ^= gfMul(gen[j + 1], factor);
+    }
+    return res;
+  }
+
+  // ---------- Hjelpere ----------
+  /** @param {string} str @returns {number[]} */
+  function utf8Bytes(str) {
+    var out = [];
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charCodeAt(i);
+      if (c >= 0xd800 && c <= 0xdbff && i + 1 < str.length) {
+        var c2 = str.charCodeAt(i + 1);
+        if (c2 >= 0xdc00 && c2 <= 0xdfff) {
+          c = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
+          i++;
+        }
+      }
+      if (c < 0x80) out.push(c);
+      else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 63));
+      else if (c < 0x10000) out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      else out.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+    }
+    return out;
+  }
+
+  /** @param {number} v */
+  function dataCapacity(v) {
+    var e = EC_M[v];
+    return e[1] * e[2] + e[3] * e[4];
+  }
+
+  /** @param {number} x @param {number} i */
+  function bit(x, i) {
+    return ((x >>> i) & 1) !== 0;
+  }
+
+  // ---------- Koding ----------
+  /**
+   * @param {string} text
+   * @returns {{size:number, version:number, modules:boolean[][]}}
+   */
+  function encode(text) {
+    var bytes = utf8Bytes(String(text));
+    var version = 0;
+    for (var v = 1; v <= 20; v++) {
+      var ccBits = v < 10 ? 8 : 16;
+      var needBits = 4 + ccBits + bytes.length * 8;
+      if (needBits <= dataCapacity(v) * 8) {
+        version = v;
+        break;
+      }
+    }
+    if (!version) throw new Error('Teksten er for lang for QR-kode');
+
+    var capBits = dataCapacity(version) * 8;
+    /** @type {number[]} */
+    var bits = [];
+    /** @param {number} val @param {number} len */
+    function push(val, len) {
+      for (var i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1);
+    }
+    push(4, 4);
+    push(bytes.length, version < 10 ? 8 : 16);
+    bytes.forEach(function (b) {
+      push(b, 8);
+    });
+    push(0, Math.min(4, capBits - bits.length));
+    while (bits.length % 8) bits.push(0);
+    var codewords = [];
+    for (var k = 0; k < bits.length; k += 8) {
+      var byte = 0;
+      for (var m = 0; m < 8; m++) byte = (byte << 1) | bits[k + m];
+      codewords.push(byte);
+    }
+    for (var pad = 0xec; codewords.length < capBits / 8; pad ^= 0xec ^ 0x11) codewords.push(pad);
+
+    // Blokker + feilretting
+    var e = EC_M[version];
+    var blocks = [];
+    var ecBlocks = [];
+    var pos = 0;
+    for (var g = 0; g < 2; g++) {
+      var count = g === 0 ? e[1] : e[3];
+      var len = g === 0 ? e[2] : e[4];
+      for (var b2 = 0; b2 < count; b2++) {
+        var blk = codewords.slice(pos, pos + len);
+        pos += len;
+        blocks.push(blk);
+        ecBlocks.push(rsRemainder(blk, e[0]));
+      }
+    }
+    var finalCw = [];
+    var maxData = Math.max(e[2], e[4]);
+    for (var i2 = 0; i2 < maxData; i2++) {
+      for (var j2 = 0; j2 < blocks.length; j2++) if (i2 < blocks[j2].length) finalCw.push(blocks[j2][i2]);
+    }
+    for (var i3 = 0; i3 < e[0]; i3++) {
+      for (var j3 = 0; j3 < ecBlocks.length; j3++) finalCw.push(ecBlocks[j3][i3]);
+    }
+
+    // Matrise
+    var size = version * 4 + 17;
+    /** @type {boolean[][]} */
+    var mod = [];
+    /** @type {boolean[][]} */
+    var fn = [];
+    for (var r = 0; r < size; r++) {
+      mod.push(new Array(size).fill(false));
+      fn.push(new Array(size).fill(false));
+    }
+    /** @param {number} x @param {number} y @param {boolean} dark */
+    function setFn(x, y, dark) {
+      mod[y][x] = dark;
+      fn[y][x] = true;
+    }
+    for (var t = 0; t < size; t++) {
+      setFn(6, t, t % 2 === 0);
+      setFn(t, 6, t % 2 === 0);
+    }
+    /** @param {number} cx @param {number} cy */
+    function finder(cx, cy) {
+      for (var dy = -4; dy <= 4; dy++) {
+        for (var dx = -4; dx <= 4; dx++) {
+          var d = Math.max(Math.abs(dx), Math.abs(dy));
+          var xx = cx + dx;
+          var yy = cy + dy;
+          if (xx >= 0 && xx < size && yy >= 0 && yy < size) setFn(xx, yy, d !== 2 && d !== 4);
+        }
+      }
+    }
+    finder(3, 3);
+    finder(size - 4, 3);
+    finder(3, size - 4);
+    var al = ALIGN[version];
+    var last = al.length - 1;
+    for (var ai = 0; ai < al.length; ai++) {
+      for (var aj = 0; aj < al.length; aj++) {
+        if ((ai === 0 && aj === 0) || (ai === 0 && aj === last) || (ai === last && aj === 0)) continue;
+        for (var ady = -2; ady <= 2; ady++) {
+          for (var adx = -2; adx <= 2; adx++) {
+            setFn(al[ai] + adx, al[aj] + ady, Math.max(Math.abs(adx), Math.abs(ady)) !== 1);
+          }
+        }
+      }
+    }
+    /** @param {number} mask */
+    function drawFormat(mask) {
+      var data = (EC_FORMAT_BITS_M << 3) | mask;
+      var rem = data;
+      for (var q = 0; q < 10; q++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+      var fbits = ((data << 10) | rem) ^ 0x5412;
+      for (var a = 0; a <= 5; a++) setFn(8, a, bit(fbits, a));
+      setFn(8, 7, bit(fbits, 6));
+      setFn(8, 8, bit(fbits, 7));
+      setFn(7, 8, bit(fbits, 8));
+      for (var b = 9; b < 15; b++) setFn(14 - b, 8, bit(fbits, b));
+      for (var c = 0; c < 8; c++) setFn(size - 1 - c, 8, bit(fbits, c));
+      for (var d2 = 8; d2 < 15; d2++) setFn(8, size - 15 + d2, bit(fbits, d2));
+      setFn(8, size - 8, true);
+    }
+    drawFormat(0);
+    if (version >= 7) {
+      var vrem = version;
+      for (var vq = 0; vq < 12; vq++) vrem = (vrem << 1) ^ ((vrem >>> 11) * 0x1f25);
+      var vbits = (version << 12) | vrem;
+      for (var vi = 0; vi < 18; vi++) {
+        var vb = bit(vbits, vi);
+        var va = size - 11 + (vi % 3);
+        var vc = Math.floor(vi / 3);
+        setFn(va, vc, vb);
+        setFn(vc, va, vb);
+      }
+    }
+    // Data
+    var idx = 0;
+    for (var right = size - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (var vert = 0; vert < size; vert++) {
+        for (var jj = 0; jj < 2; jj++) {
+          var x = right - jj;
+          var upward = ((right + 1) & 2) === 0;
+          var y = upward ? size - 1 - vert : vert;
+          if (!fn[y][x] && idx < finalCw.length * 8) {
+            mod[y][x] = bit(finalCw[idx >>> 3], 7 - (idx & 7));
+            idx++;
+          }
+        }
+      }
+    }
+
+    /** @param {number} mask @param {number} x @param {number} y */
+    function maskBit(mask, x, y) {
+      switch (mask) {
+        case 0:
+          return (x + y) % 2 === 0;
+        case 1:
+          return y % 2 === 0;
+        case 2:
+          return x % 3 === 0;
+        case 3:
+          return (x + y) % 3 === 0;
+        case 4:
+          return (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0;
+        case 5:
+          return ((x * y) % 2) + ((x * y) % 3) === 0;
+        case 6:
+          return (((x * y) % 2) + ((x * y) % 3)) % 2 === 0;
+        default:
+          return (((x + y) % 2) + ((x * y) % 3)) % 2 === 0;
+      }
+    }
+    /** @param {number} mask */
+    function applyMask(mask) {
+      for (var yy = 0; yy < size; yy++) {
+        for (var xx = 0; xx < size; xx++) {
+          if (!fn[yy][xx] && maskBit(mask, xx, yy)) mod[yy][xx] = !mod[yy][xx];
+        }
+      }
+    }
+    function penalty() {
+      var p = 0;
+      var line, run, prev;
+      for (var dir = 0; dir < 2; dir++) {
+        for (var a = 0; a < size; a++) {
+          run = 0;
+          prev = null;
+          line = [];
+          for (var b = 0; b < size; b++) {
+            var cell = dir === 0 ? mod[a][b] : mod[b][a];
+            line.push(cell ? 1 : 0);
+            if (cell === prev) {
+              run++;
+              if (run === 5) p += 3;
+              else if (run > 5) p++;
+            } else {
+              run = 1;
+              prev = cell;
+            }
+          }
+          var s = line.join('');
+          var re = /(?=(10111010000|00001011101))/g;
+          var found = s.match(re);
+          if (found) p += 40 * found.length;
+        }
+      }
+      for (var yy = 0; yy < size - 1; yy++) {
+        for (var xx = 0; xx < size - 1; xx++) {
+          var c = mod[yy][xx];
+          if (c === mod[yy][xx + 1] && c === mod[yy + 1][xx] && c === mod[yy + 1][xx + 1]) p += 3;
+        }
+      }
+      var dark = 0;
+      for (var y2 = 0; y2 < size; y2++) for (var x2 = 0; x2 < size; x2++) if (mod[y2][x2]) dark++;
+      var k = Math.ceil(Math.abs(dark * 20 - size * size * 10) / (size * size)) - 1;
+      p += Math.max(0, k) * 10;
+      return p;
+    }
+    var bestMask = 0;
+    var best = Infinity;
+    for (var mk = 0; mk < 8; mk++) {
+      applyMask(mk);
+      drawFormat(mk);
+      var pen = penalty();
+      if (pen < best) {
+        best = pen;
+        bestMask = mk;
+      }
+      applyMask(mk);
+    }
+    applyMask(bestMask);
+    drawFormat(bestMask);
+    return { size: size, version: version, modules: mod };
+  }
+
+  /**
+   * SVG-streng for teksten.
+   * @param {string} text
+   * @param {{margin?:number, dark?:string, light?:string, title?:string}} [opts]
+   */
+  function toSvg(text, opts) {
+    var o = opts || {};
+    var margin = o.margin == null ? 4 : o.margin;
+    var qr = encode(text);
+    var n = qr.size + margin * 2;
+    var d = '';
+    for (var y = 0; y < qr.size; y++) {
+      for (var x = 0; x < qr.size; x++) {
+        if (qr.modules[y][x]) d += 'M' + (x + margin) + ' ' + (y + margin) + 'h1v1h-1z';
+      }
+    }
+    var title = o.title ? '<title>' + escapeXml(o.title) + '</title>' : '';
+    return (
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' +
+      n +
+      ' ' +
+      n +
+      '" shape-rendering="crispEdges" role="img">' +
+      title +
+      '<rect width="100%" height="100%" fill="' +
+      (o.light || '#fff') +
+      '"/>' +
+      '<path d="' +
+      d +
+      '" fill="' +
+      (o.dark || '#000') +
+      '"/></svg>'
+    );
+  }
+
+  /** @param {string} s */
+  function escapeXml(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] || c;
+    });
+  }
+
+  return { encode: encode, toSvg: toSvg };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = ISQ_QR;
+
+      // @ts-check
+/**
+ * Felles klientkode: transport til Supabase, sanntidsvarsler, klokkesynkronisering,
+ * polling, trygg lokal lagring og små DOM-hjelpere.
+ *
+ * Transport (BOOT.supabaseUrl + BOOT.supabaseKey fra config.js):
+ *  - public.voteState  → leser stemmekatalogen (tabellen isq_live) direkte
+ *  - public.vote       → databasefunksjonen isq_cast_vote (rask, tåler mange samtidige)
+ *  - alt annet         → Edge Function «isq» (motoren)
+ *  - sanntid           → Supabase Realtime på isq_live / isq_tick, med polling som reserve
+ */
+var ISQ_Client = (function () {
+  'use strict';
+
+  var w = /** @type {any} */ (window);
+  var BOOT = w.ISQ_BOOT || {};
+  var SB_URL = String(BOOT.supabaseUrl || '').replace(/\/+$/, '');
+  var SB_KEY = String(BOOT.supabaseKey || '');
+
+  /** @param {any} res */
+  function unwrap(res) {
+    if (res && res.ok) return res.data;
+    var err = /** @type {any} */ (new Error((res && res.error) || 'Ukjent feil'));
+    err.code = (res && res.code) || 'ERROR';
+    throw err;
+  }
+
+  function netError(msg) {
+    var err = /** @type {any} */ (new Error(msg || 'Nettverksfeil'));
+    err.code = 'NETWORK';
+    return err;
+  }
+
+  /** @param {string} url @param {any} init @param {number} [timeoutMs] @returns {Promise<any>} */
+  function fetchJson(url, init, timeoutMs) {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var t = ctrl
+      ? setTimeout(function () {
+          ctrl.abort();
+        }, timeoutMs || 15000)
+      : null;
+    var opts = Object.assign({ cache: 'no-store', credentials: 'omit', signal: ctrl ? ctrl.signal : undefined }, init || {});
+    return fetch(url, opts).then(
+      function (r) {
+        if (t) clearTimeout(t);
+        return r.text().then(function (txt) {
+          var data = null;
+          try {
+            data = txt ? JSON.parse(txt) : null;
+          } catch (e) {
+            throw netError('Uventet svar fra serveren');
+          }
+          if (!r.ok && !(data && data.ok === false)) throw netError('HTTP ' + r.status);
+          return data;
+        });
+      },
+      function () {
+        if (t) clearTimeout(t);
+        throw netError();
+      }
+    );
+  }
+
+  /** Hodere for Supabase REST (publiserbar nøkkel – trygg i nettleseren). */
+  function restHeaders(json) {
+    /** @type {Record<string,string>} */
+    var h = { apikey: SB_KEY };
+    if (/^eyJ/.test(SB_KEY)) h.Authorization = 'Bearer ' + SB_KEY;
+    if (json) h['Content-Type'] = 'application/json';
+    return h;
+  }
+
+  /** Finner avstemningen stemmesiden skal vise (samme regler som motoren). @param {any} dir @param {string|null} key */
+  function resolveVotePoll(dir, key) {
+    var polls = (dir && dir.polls) || {};
+    var order = (dir && dir.order) || Object.keys(polls);
+    if (key) {
+      if (polls[key]) return key;
+      var pair = [key + '-before', key + '-after'].filter(function (id) {
+        return !!polls[id];
+      });
+      if (!pair.length) return null;
+      var open = pair.filter(function (id) {
+        return polls[id].status === 'open';
+      })[0];
+      if (open) return open;
+      return polls[pair[1]].status !== 'draft' ? pair[1] : pair[0];
+    }
+    var active = dir && dir.active;
+    if (active && polls[active] && polls[active].status === 'open') return active;
+    var firstOpen = order.filter(function (/** @type {string} */ id) {
+      return polls[id] && polls[id].status === 'open';
+    })[0];
+    return firstOpen || active || null;
+  }
+
+  /** @param {any} payload */
+  function voteState(payload) {
+    return fetchJson(SB_URL + '/rest/v1/isq_live?id=eq.1&select=data', { method: 'GET', headers: restHeaders(false) }, 12000).then(function (rows) {
+      var dir = (rows && rows[0] && rows[0].data) || {};
+      var id = resolveVotePoll(dir, payload && payload.poll ? String(payload.poll) : null);
+      return {
+        version: dir.version || 0,
+        event: dir.event || {},
+        poll: id && dir.polls && dir.polls[id] ? dir.polls[id] : null
+      };
+    });
+  }
+
+  /** @param {any} p */
+  function castVote(p) {
+    return fetchJson(
+      SB_URL + '/rest/v1/rpc/isq_cast_vote',
+      { method: 'POST', headers: restHeaders(true), body: JSON.stringify({ p_token: p.token, p_poll_id: p.pollId, p_choice: p.choice }) },
+      15000
+    ).then(unwrap);
+  }
+
+  /**
+   * Kall til Edge Function som «enkel» forespørsel (text/plain, ingen egne hodere),
+   * slik at nettleseren ikke trenger en ekstra CORS-runde før hvert trykk.
+   * @param {string} method @param {any} payload
+   */
+  function viaFunction(method, payload) {
+    return fetchJson(
+      SB_URL + '/functions/v1/isq',
+      { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ method: method, payload: payload || {} }) },
+      20000
+    ).then(unwrap);
+  }
+
+  /** @param {string} method @param {any} [payload] @returns {Promise<any>} */
+  function call(method, payload) {
+    if (!SB_URL) return Promise.reject(Object.assign(new Error('Mangler adressen til Supabase (config.js).'), { code: 'CONFIG' }));
+    if (method === 'public.voteState') return voteState(payload || {});
+    if (method === 'public.vote') return castVote(payload || {});
+    return viaFunction(method, payload || {});
+  }
+
+  // ---------- Sanntid ----------
+  /** @type {any} */
+  var sb = null;
+  /** @type {Record<string, Array<() => void>>} */
+  var listeners = {};
+  /** @type {Record<string, boolean>} */
+  var rtOk = {};
+  var rtStarted = false;
+
+  function startRealtime() {
+    if (rtStarted || !SB_URL || !SB_KEY) return;
+    if (!w.supabase || !w.supabase.createClient) {
+      // Biblioteket lastes asynkront fra CDN; prøv igjen litt senere
+      setTimeout(startRealtime, 1000);
+      return;
+    }
+    rtStarted = true;
+    try {
+      sb = w.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
+    } catch (e) {
+      return;
+    }
+    Object.keys(listeners).forEach(subscribeTable);
+  }
+
+  /** @param {string} table */
+  function subscribeTable(table) {
+    if (!sb) return;
+    sb.channel('isq-' + table + '-' + Math.random().toString(36).slice(2, 8))
+      .on('postgres_changes', { event: '*', schema: 'public', table: table }, function () {
+        (listeners[table] || []).forEach(function (fn) {
+          fn();
+        });
+      })
+      .subscribe(function (/** @type {string} */ status) {
+        var was = !!rtOk[table];
+        rtOk[table] = status === 'SUBSCRIBED';
+        // Etter ny tilkobling: hent tilstand i tilfelle vi gikk glipp av noe
+        if (rtOk[table] && !was)
+          (listeners[table] || []).forEach(function (fn) {
+            fn();
+          });
+      });
+  }
+
+  /** @param {string} table @param {() => void} fn */
+  function onChange(table, fn) {
+    var first = !listeners[table];
+    (listeners[table] = listeners[table] || []).push(fn);
+    if (sb && first) subscribeTable(table);
+    startRealtime();
+  }
+
+  // ---------- Klokke ----------
+  /** @type {{offset:number, rtt:number}[]} */
+  var samples = [];
+  var offset = 0;
+
+  /** @param {number} serverNow @param {number} sentAt @param {number} receivedAt */
+  function syncClock(serverNow, sentAt, receivedAt, waited) {
+    if (typeof serverNow !== 'number') return;
+    // Ved long-polling har serveren ventet en stund; trekk fra ventetiden
+    var rtt = Math.max(0, receivedAt - sentAt - (Number(waited) || 0));
+    samples.push({ offset: serverNow - (receivedAt - rtt / 2), rtt: rtt });
+    if (samples.length > 8) samples.shift();
+    var best = samples.reduce(function (a, b) {
+      return b.rtt < a.rtt ? b : a;
+    });
+    offset = best.offset;
+  }
+
+  function serverNow() {
+    return Date.now() + offset;
+  }
+
+  // ---------- Polling med gjenoppkobling ----------
+  /**
+   * interval: vanlig pollingintervall; rtInterval: intervall når sanntid (realtime: tabellnavn) er tilkoblet.
+   * minGap: minste tid mellom to henting utløst av sanntidsvarsler.
+   * @param {{method:string, payload?:()=>any, interval:number, rtInterval?:number, realtime?:string, minGap?:number,
+   *          hiddenInterval?:number, jitter?:number,
+   *          onData:(data:any)=>void, onStatus?:(online:boolean)=>void, onError?:(e:any)=>boolean|void}} o
+   */
+  function poller(o) {
+    var failures = 0;
+    var online = true;
+    var stopped = false;
+    /** @type {any} */
+    var timer = null;
+    var inFlight = false;
+    var lastStart = 0;
+    var dirty = false;
+
+    function schedule(ms) {
+      clearTimeout(timer);
+      if (!stopped) timer = setTimeout(tick, ms);
+    }
+    function setOnline(v) {
+      if (v !== online) {
+        online = v;
+        if (o.onStatus) o.onStatus(v);
+      }
+    }
+    function nextDelay() {
+      var rt = o.realtime && rtOk[o.realtime] && o.rtInterval;
+      var base = document.hidden && o.hiddenInterval ? Math.max(o.hiddenInterval, rt || 0) : rt || o.interval;
+      // Etter feil: prøv raskt igjen de første gangene, deretter gradvis sjeldnere
+      if (failures) base = failures <= 2 ? 300 : Math.min(1000 * Math.pow(1.5, failures - 2), 6000);
+      var j = o.jitter ? Math.random() * o.jitter : 0;
+      return base + j;
+    }
+    function tick() {
+      if (inFlight) {
+        dirty = true;
+        return;
+      }
+      inFlight = true;
+      dirty = false;
+      var sent = Date.now();
+      lastStart = sent;
+      var payload = o.payload ? o.payload() : {};
+      call(o.method, payload)
+        .then(function (data) {
+          inFlight = false;
+          failures = 0;
+          setOnline(true);
+          if (data && typeof data.serverNow === 'number') syncClock(data.serverNow, sent, Date.now(), 0);
+          o.onData(data);
+        })
+        .catch(function (e) {
+          inFlight = false;
+          var handled = o.onError ? o.onError(e) : false;
+          if (!handled) {
+            failures++;
+            // Vis «frakoblet» først når flere forsøk på rad har feilet
+            if (failures >= 3) setOnline(false);
+          }
+        })
+        .then(function () {
+          // Kom det et sanntidsvarsel mens vi hentet, hent på nytt med en gang
+          schedule(dirty && !failures ? Math.max(0, (o.minGap || 0) - (Date.now() - lastStart)) : nextDelay());
+        });
+    }
+    /** Sanntidsvarsel: hent snart, men ikke oftere enn minGap. */
+    function kick() {
+      if (stopped) return;
+      if (inFlight) {
+        dirty = true;
+        return;
+      }
+      schedule(Math.max(0, (o.minGap || 0) - (Date.now() - lastStart)));
+    }
+    if (o.realtime) onChange(o.realtime, kick);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) schedule(50);
+    });
+    w.addEventListener('online', function () {
+      schedule(50);
+    });
+    schedule(0);
+    return {
+      now: function () {
+        schedule(0);
+      },
+      stop: function () {
+        stopped = true;
+        clearTimeout(timer);
+      },
+      isOnline: function () {
+        return online;
+      }
+    };
+  }
+
+  // ---------- Lagring ----------
+  /** @type {Record<string,string>} */
+  var memory = {};
+  var storage = {
+    /** @param {string} k */
+    get: function (k) {
+      try {
+        var v = w.localStorage.getItem(k);
+        if (v != null) return v;
+      } catch (e) {
+        /* ignorert */
+      }
+      return Object.prototype.hasOwnProperty.call(memory, k) ? memory[k] : null;
+    },
+    /** @param {string} k @param {string} v */
+    set: function (k, v) {
+      memory[k] = v;
+      try {
+        w.localStorage.setItem(k, v);
+      } catch (e) {
+        /* ignorert */
+      }
+    },
+    /** @param {string} k */
+    remove: function (k) {
+      delete memory[k];
+      try {
+        w.localStorage.removeItem(k);
+      } catch (e) {
+        /* ignorert */
+      }
+    }
+  };
+
+  /** @param {number} [bytes] */
+  function randomToken(bytes) {
+    var n = bytes || 24;
+    var arr = new Uint8Array(n);
+    if (w.crypto && w.crypto.getRandomValues) w.crypto.getRandomValues(arr);
+    else for (var i = 0; i < n; i++) arr[i] = Math.floor(Math.random() * 256);
+    var s = '';
+    for (var j = 0; j < arr.length; j++) s += String.fromCharCode(arr[j]);
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  // ---------- DOM ----------
+  /** @param {any} s */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return /** @type {any} */ ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  /** @param {string} id @returns {any} */
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  /** Nettstedets rot-adresse (GitHub Pages), med skråstrek til slutt. */
+  function siteBase() {
+    var b = String(BOOT.siteUrl || '');
+    if (!b) {
+      // Utled fra denne sidens adresse: …/stem/, …/kontroll/ osv. ligger én mappe under roten
+      var here = location.href.split('?')[0].split('#')[0];
+      b = here.replace(/[^/]*$/, '');
+      if (/\/(stem|kontroll|admin|skjerm)\/$/.test(b)) b = b.replace(/[^/]+\/$/, '');
+    }
+    return b.replace(/\/*$/, '/');
+  }
+
+  /**
+   * Stemmesidens adresse: <nettsted>/stem/[?poll=s1]
+   * @param {string} [pollKey]
+   */
+  function voteUrl(pollKey) {
+    var url = siteBase() + 'stem/';
+    if (pollKey) url += '?poll=' + encodeURIComponent(pollKey);
+    return url;
+  }
+
+  return {
+    BOOT: BOOT,
+    call: call,
+    serverNow: serverNow,
+    syncClock: syncClock,
+    poller: poller,
+    storage: storage,
+    randomToken: randomToken,
+    esc: esc,
+    $: $,
+    voteUrl: voteUrl,
+    siteBase: siteBase,
+    onChange: onChange,
+    realtimeOk: function (/** @type {string} */ t) {
+      return !!rtOk[t];
+    }
+  };
+})();
+
+      // @ts-check
+/* global ISQ_Config, ISQ_Timer, ISQ_QR, ISQ_Client */
+/**
+ * Mobil kontrollflate. All tilstand ligger på serveren; denne siden henter
+ * kontrolltilstand hvert 1,5 sekund og sender handlinger via rpc.
+ */
+(function () {
+  'use strict';
+
+  var C = ISQ_Config;
+  var T = ISQ_Timer;
+  var Q = ISQ_QR;
+  var cl = ISQ_Client;
+  var $ = cl.$;
+  var esc = cl.esc;
+  var BOOT = cl.BOOT;
+
+  var session = cl.storage.get('isq-session');
+  /** @type {any} */
+  var state = null;
+  /** @type {any} */
+  var poller = null;
+  var online = true;
+  var adminRendered = false;
+  var currentTab = BOOT.page === 'admin' ? 'admin' : cl.storage.get('isq-tab') || 'run';
+
+  var CH = ['against', 'neutral', 'for'];
+  var POLL_NAMES = {
+    'main-before': 'Hovedspørsmål • før',
+    'main-after': 'Hovedspørsmål • etter',
+    's1-before': 'Påstand 1 • før',
+    's1-after': 'Påstand 1 • etter',
+    's2-before': 'Påstand 2 • før',
+    's2-after': 'Påstand 2 • etter',
+    's3-before': 'Påstand 3 • før',
+    's3-after': 'Påstand 3 • etter'
+  };
+  var STATUS_LABEL = { draft: 'IKKE ÅPNET', open: 'ÅPEN', closed: 'LUKKET' };
+
+  // ---------- Hjelpere ----------
+  /**
+   * @param {string} label @param {string} action @param {any} [params]
+   * @param {{cls?:string, confirm?:string, title?:string, typed?:string, disabled?:boolean, sub?:string}} [o]
+   */
+  function btn(label, action, params, o) {
+    var x = o || {};
+    return (
+      '<button type="button" class="btn ' +
+      (x.cls || '') +
+      '" data-act="' +
+      action +
+      '" data-p="' +
+      esc(JSON.stringify(params || {})) +
+      '"' +
+      (x.confirm ? ' data-confirm="' + esc(x.confirm) + '"' : '') +
+      (x.title ? ' data-title="' + esc(x.title) + '"' : '') +
+      (x.typed ? ' data-typed="' + esc(x.typed) + '"' : '') +
+      (x.disabled ? ' disabled' : '') +
+      '>' +
+      esc(label) +
+      (x.sub ? '<small>' + esc(x.sub) + '</small>' : '') +
+      '</button>'
+    );
+  }
+  /** @param {string} team */
+  function teamName(team) {
+    return state && state.teams[team] ? state.teams[team].name : team === 'north' ? 'Lag Nord' : 'Lag Sør';
+  }
+  /** @param {string} p */
+  function pos(p) {
+    return p === 'for' ? 'FOR' : 'MOT';
+  }
+  function stNo() {
+    return state.activeStatement || 1;
+  }
+  /** @param {number} n */
+  function statement(n) {
+    return state.statements.filter(function (/** @type {any} */ s) {
+      return s.no === n;
+    })[0];
+  }
+  /** @param {string} iso */
+  function clock(iso) {
+    try {
+      var d = new Date(iso);
+      return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    } catch (e) {
+      return '';
+    }
+  }
+  /** @param {string} msg @param {boolean} [ok] */
+  function toast(msg, ok) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (ok ? ' ok' : '');
+    clearTimeout(/** @type {any} */ (toast).t);
+    /** @type {any} */ (toast).t = setTimeout(
+      function () {
+        t.className = 'toast';
+      },
+      ok ? 1800 : 4500
+    );
+  }
+
+  // ---------- Innlogging ----------
+  function showLogin(msg) {
+    if (poller) poller.stop();
+    poller = null;
+    $('app').hidden = true;
+    $('login').hidden = false;
+    $('loginErr').textContent = msg || '';
+    $('loginTitle').textContent = BOOT.title || 'I-Squared Statsbygg';
+    setTimeout(function () {
+      $('pin').focus();
+    }, 50);
+  }
+  $('loginForm').addEventListener('submit', function (/** @type {Event} */ e) {
+    e.preventDefault();
+    var b = $('loginBtn');
+    b.disabled = true;
+    $('loginErr').textContent = '';
+    cl.call('auth.login', { pin: $('pin').value })
+      .then(function (d) {
+        session = d.session;
+        cl.storage.set('isq-session', d.session);
+        $('pin').value = '';
+        start();
+      })
+      .catch(function (/** @type {any} */ err) {
+        $('loginErr').textContent = err.message;
+      })
+      .then(function () {
+        b.disabled = false;
+      });
+  });
+
+  function start() {
+    $('login').hidden = true;
+    $('app').hidden = false;
+    selectTab(currentTab);
+    poller = cl.poller({
+      method: 'control.state',
+      payload: function () {
+        return { session: session };
+      },
+      interval: 1500,
+      rtInterval: 3000,
+      realtime: 'isq_tick',
+      minGap: 400,
+      hiddenInterval: 5000,
+      onData: function (d) {
+        if (state && d.version < state.version) return; // eldre svar som kom sent
+        state = d;
+        flushReportIfNeeded();
+        render();
+      },
+      onStatus: function (on) {
+        online = on;
+        renderConn();
+      },
+      onError: function (/** @type {any} */ e) {
+        if (e.code === 'AUTH') {
+          cl.storage.remove('isq-session');
+          session = null;
+          showLogin(e.message);
+          return true;
+        }
+        return false;
+      }
+    });
+  }
+
+  // ---------- Faner ----------
+  /** @param {string} tab */
+  function selectTab(tab) {
+    currentTab = tab;
+    cl.storage.set('isq-tab', tab);
+    document.querySelectorAll('.tabbar button').forEach(function (b) {
+      b.setAttribute('aria-selected', b.getAttribute('data-tab') === tab ? 'true' : 'false');
+    });
+    document.querySelectorAll('.tab').forEach(function (s) {
+      s.classList.toggle('active', s.id === 'tab-' + tab);
+    });
+    if (tab === 'admin') adminRendered = false;
+    if (state) render();
+    window.scrollTo(0, 0);
+  }
+  document.querySelector('.tabbar').addEventListener('click', function (e) {
+    var b = /** @type {HTMLElement} */ (e.target).closest('button[data-tab]');
+    if (b) selectTab(/** @type {string} */ (b.getAttribute('data-tab')));
+  });
+
+  // ---------- Rapport i bakgrunnen ----------
+  var flushing = false;
+  /** Rapporten til regnearket skrives i et eget kall, så knappene ikke må vente på den. */
+  function flushReportIfNeeded() {
+    if (!state || !state.reportPending || flushing) return;
+    flushing = true;
+    cl.call('control.flushReport', { session: session })
+      .catch(function () {
+        /* prøves igjen senere */
+      })
+      .then(function () {
+        flushing = false;
+      });
+  }
+
+  // ---------- Handlinger ----------
+  var busy = false;
+  /** @param {string} action @param {any} params @param {HTMLElement|null} [el] */
+  function act(action, params, el) {
+    if (busy) {
+      toast('Venter på svar fra forrige trykk …', true);
+      return Promise.resolve(null);
+    }
+    busy = true;
+    if (el) el.classList.add('busy');
+    return cl
+      .call('control.action', { session: session, action: action, params: params || {} })
+      .then(function (d) {
+        state = d.state;
+        render();
+        flushReportIfNeeded();
+        if (d.result && d.result.warning) toast(d.result.warning);
+        return d;
+      })
+      .catch(function (/** @type {any} */ e) {
+        if (e.code === 'AUTH') {
+          cl.storage.remove('isq-session');
+          showLogin(e.message);
+        } else {
+          toast(e.message || 'Handlingen feilet.');
+        }
+        return null;
+      })
+      .then(function (d) {
+        busy = false;
+        if (el) el.classList.remove('busy');
+        return d;
+      });
+  }
+
+  // Bekreftelsesdialog
+  /** @type {any} */
+  var modalResolve = null;
+  /** @param {{title?:string, text:string, typed?:string, extra?:string, ok?:string}} o @returns {Promise<boolean>} */
+  function confirmDialog(o) {
+    $('modalTitle').textContent = o.title || 'Bekreft';
+    $('modalText').textContent = o.text;
+    var extra = o.extra || '';
+    if (o.typed)
+      extra +=
+        '<label for="typedInput">Skriv <b>' +
+        esc(o.typed) +
+        '</b> for å bekrefte</label><input id="typedInput" autocomplete="off" autocapitalize="characters" />';
+    $('modalExtra').innerHTML = extra;
+    $('modalOk').textContent = o.ok || 'Bekreft';
+    $('modal').classList.add('show');
+    setTimeout(function () {
+      var f = /** @type {HTMLElement|null} */ ($('modalExtra').querySelector('input,textarea'));
+      (f || $('modalCancel')).focus();
+    }, 50);
+    return new Promise(function (resolve) {
+      modalResolve = function (/** @type {boolean} */ ok) {
+        if (ok && o.typed) {
+          var v = String($('typedInput').value || '')
+            .trim()
+            .toUpperCase();
+          if (v !== o.typed.toUpperCase()) {
+            toast('Skriv ' + o.typed + ' for å bekrefte.');
+            return;
+          }
+        }
+        $('modal').classList.remove('show');
+        modalResolve = null;
+        resolve(ok);
+      };
+    });
+  }
+  $('modalOk').addEventListener('click', function () {
+    if (modalResolve) modalResolve(true);
+  });
+  $('modalCancel').addEventListener('click', function () {
+    if (modalResolve) modalResolve(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modalResolve) modalResolve(false);
+  });
+
+  document.addEventListener('click', function (e) {
+    var el = /** @type {HTMLElement|null} */ (/** @type {HTMLElement} */ (e.target).closest('[data-act]'));
+    if (!el || /** @type {any} */ (el).disabled) return;
+    if (el.tagName === 'A') e.preventDefault();
+    var action = /** @type {string} */ (el.getAttribute('data-act'));
+    var params = {};
+    try {
+      params = JSON.parse(el.getAttribute('data-p') || '{}');
+    } catch (err) {
+      /* ignorert */
+    }
+    if (action.indexOf('ui:') === 0) return uiAction(action.slice(3), params, el);
+    var msg = el.getAttribute('data-confirm');
+    if (msg) {
+      confirmDialog({ title: el.getAttribute('data-title') || 'Bekreft', text: msg, typed: el.getAttribute('data-typed') || undefined }).then(function (ok) {
+        if (ok) act(action, Object.assign({}, params, { confirm: true }), el);
+      });
+      return;
+    }
+    act(action, params, el);
+  });
+
+  /** Handlinger som krever skjema/inndata. @param {string} name @param {any} p @param {HTMLElement} el */
+  function uiAction(name, p, el) {
+    if (name === 'override') {
+      var r = (state.results || {})[String(p.statementNo)] || {};
+      confirmDialog({
+        title: 'Overstyr resultat – påstand ' + p.statementNo,
+        text: 'Sett flyttede stemmer manuelt. Resultatet merkes som manuelt fastsatt.',
+        extra:
+          '<div class="grid"><div><label for="ovN">' +
+          esc(teamName('north')) +
+          '</label><input id="ovN" type="number" inputmode="numeric" min="0" value="' +
+          (r.north || 0) +
+          '" /></div>' +
+          '<div><label for="ovS">' +
+          esc(teamName('south')) +
+          '</label><input id="ovS" type="number" inputmode="numeric" min="0" value="' +
+          (r.south || 0) +
+          '" /></div></div>' +
+          '<label for="ovR">Begrunnelse (vises i logg og rapport)</label><textarea id="ovR"></textarea>',
+        ok: 'Overstyr'
+      }).then(function (ok) {
+        if (!ok) return;
+        act(
+          'overrideResult',
+          {
+            statementNo: p.statementNo,
+            north: Number($('ovN').value || 0),
+            south: Number($('ovS').value || 0),
+            reason: String($('ovR').value || '').trim(),
+            confirm: true
+          },
+          el
+        );
+      });
+    } else if (name === 'customTime' || name === 'customStart') {
+      var m = Number($('tMin').value || 0);
+      var s = Number($('tSec').value || 0);
+      var secs = Math.max(0, Math.round(m * 60 + s));
+      act(name === 'customStart' ? 'timerStart' : 'timerSet', { seconds: secs }, el);
+    } else if (name === 'saveEvent') {
+      var slug = String($('aSlug').value || '').trim();
+      var params = {
+        title: $('aTitle').value,
+        heroTitle: $('aHero').value,
+        kicker: $('aKicker').value,
+        mainQuestion: $('aMain').value,
+        labelAgainst: $('aLA').value,
+        labelNeutral: $('aLN').value,
+        labelFor: $('aLF').value,
+        slug: slug
+      };
+      var go = function (/** @type {boolean} */ confirmed) {
+        if (confirmed) /** @type {any} */ (params).confirm = true;
+        act('updateEvent', params, el).then(function (d) {
+          if (d) {
+            adminRendered = false;
+            render();
+            toast('Lagret', true);
+          }
+        });
+      };
+      if (slug && slug !== state.eventConfig.slug) {
+        confirmDialog({ title: 'Bytt arrangement-ID', text: 'Lenker og QR-koder med ?event=' + state.eventConfig.slug + ' slutter å virke. Fortsette?' }).then(
+          function (ok) {
+            if (ok) go(true);
+          }
+        );
+      } else go(false);
+    } else if (name === 'saveStatement') {
+      var n = p.statementNo;
+      act(
+        'updateStatement',
+        {
+          statementNo: n,
+          text: $('sT' + n).value,
+          short: $('sS' + n).value,
+          northPosition: $('sN' + n).value,
+          southPosition: $('sP' + n).value
+        },
+        el
+      ).then(function (d) {
+        if (d) toast('Påstand ' + n + ' lagret', true);
+      });
+    } else if (name === 'saveSettings') {
+      act(
+        'updateSettings',
+        {
+          soundEnabled: $('setSound').checked,
+          autoStartTimer: $('setAuto').checked,
+          requireEqualTurnout: $('setEqual').checked,
+          opening: Number($('dOpen').value),
+          cross: Number($('dCross').value),
+          closing: Number($('dClose').value),
+          team: Number($('dTeam').value)
+        },
+        el
+      ).then(function (d) {
+        if (d) toast('Innstillinger lagret', true);
+      });
+    } else if (name === 'demo') {
+      act('generateDemoVotes', { pollId: $('demoPoll').value, count: $('demoCount').value ? Number($('demoCount').value) : undefined }, el).then(function (d) {
+        if (d && d.result) toast(d.result.count + ' demostemmer lagt til', true);
+      });
+    } else if (name === 'reloadAdmin') {
+      adminRendered = false;
+      /** @type {any} */ ($('tab-admin')).__html = '';
+      render();
+    } else if (name === 'logout') {
+      cl.call('auth.logout', { session: session }).catch(function () {});
+      cl.storage.remove('isq-session');
+      session = null;
+      showLogin('Du er logget ut.');
+    } else if (name === 'copy') {
+      var url = String(p.url || '');
+      if (navigator.clipboard)
+        navigator.clipboard.writeText(url).then(
+          function () {
+            toast('Lenke kopiert', true);
+          },
+          function () {
+            toast(url);
+          }
+        );
+      else toast(url);
+    } else if (name === 'tab') {
+      selectTab(p.tab);
+    }
+  }
+
+  // ---------- Rendring ----------
+  // Tegn ikke om en fane mens fingeren er på skjermen (hindrer tapte trykk på mobil)
+  var pointerActive = false;
+  var pendingRender = false;
+  document.addEventListener(
+    'pointerdown',
+    function () {
+      pointerActive = true;
+    },
+    true
+  );
+  ['pointerup', 'pointercancel'].forEach(function (ev) {
+    document.addEventListener(
+      ev,
+      function () {
+        setTimeout(function () {
+          pointerActive = false;
+          if (pendingRender) {
+            pendingRender = false;
+            render();
+          }
+        }, 250);
+      },
+      true
+    );
+  });
+  /** @param {string} id @param {string} html @returns {boolean} om innholdet ble byttet */
+  function setHtml(id, html) {
+    var el = /** @type {any} */ ($(id));
+    if (el.__html === html) return false;
+    if (pointerActive) {
+      pendingRender = true;
+      return false;
+    }
+    el.innerHTML = html;
+    el.__html = html;
+    return true;
+  }
+
+  function renderConn() {
+    var dot = $('connDot');
+    dot.className = 'dot' + (online ? '' : ' off');
+    $('connText').textContent = online ? 'Tilkoblet' : 'Frakoblet – prøver igjen';
+  }
+
+  function render() {
+    if (!state) return;
+    renderConn();
+    renderHeader();
+    if (currentTab === 'run') renderRun();
+    if (currentTab === 'poll') renderPoll();
+    if (currentTab === 'timer') renderTimer();
+    if (currentTab === 'cards') renderCards();
+    if (currentTab === 'results') renderResults();
+    if (currentTab === 'media') renderMedia();
+    if (currentTab === 'admin') renderAdmin();
+  }
+
+  function activePoll() {
+    return state.poll;
+  }
+
+  function renderHeader() {
+    $('appTitle').textContent = state.event.title + ' • Kontroll';
+    var v = state.view === 'video' && state.video ? 'Video' : C.VIEW_LABELS[state.view] || state.view;
+    if (['team', 'opening', 'closing'].indexOf(state.view) !== -1) v += ' ' + (state.activeTeam === 'north' ? 'Nord' : 'Sør');
+    $('chipView').textContent = v;
+    $('chipStatement').textContent = String(stNo()) + ' • ' + (statement(stNo()) || {}).short;
+    var p = activePoll();
+    $('chipPoll').textContent = p
+      ? (p.status === 'open' ? 'ÅPEN ' : p.status === 'closed' ? 'Lukket ' : '') +
+        (p.type === 'main' ? 'Hoved' : 'P' + p.statementNo) +
+        (p.phase === 'before' ? ' før' : ' etter')
+      : '–';
+    $('chipVotes').textContent = p ? String(p.count) : '0';
+    $('chipScore').textContent = state.leaderboard.north + ' – ' + state.leaderboard.south;
+  }
+
+  function renderRun() {
+    var n = stNo();
+    var s = statement(n) || {};
+    var nx = state.nextStep;
+    var cues = state.cues || [];
+    var cur = cues[state.cueIndex];
+    var d = state.settings.durations;
+    var p = activePoll();
+    var inSegment = !!state.segment && ['opening', 'cross', 'closing'].indexOf(state.view) !== -1;
+    var h = '';
+
+    // Neste steg i kjøreplanen
+    h += '<h2>Kjøreplan</h2><div class="card next">';
+    h += '<div class="now">Sist utført: <b>' + (cur ? esc(cur.step + '. ' + cur.label) : 'ingenting ennå') + '</b></div>';
+    if (nx) {
+      h += '<div class="nextLabel">Neste: <b>' + esc(nx.step + '. ' + nx.label) + '</b></div>';
+      h += '<button type="button" class="btn gold big" data-act="nextCue" data-p="{}" id="nextBtn">NESTE ▶︎</button>';
+    } else {
+      h += '<div class="nextLabel">Kjøreplanen er fullført.</div>';
+    }
+    if (inSegment) h += '<div style="height:8px"></div>' + btn('Tilbake til påstand ' + n, 'showStatement', { statementNo: n }, { cls: 'big' });
+    h += '</div>';
+
+    // Hele kjøreplanen – trykk for å hoppe
+    h +=
+      '<details class="card cueList"' +
+      (cueListOpen ? ' open' : '') +
+      '><summary>Hele kjøreplanen (' +
+      cues.length +
+      ' steg) – trykk et steg for å hoppe dit</summary><ol>';
+    cues.forEach(function (/** @type {any} */ c) {
+      var cls = c.index === state.cueIndex ? ' current' : c.index < state.cueIndex ? ' done' : '';
+      h +=
+        '<li><button type="button" class="cue' +
+        cls +
+        '" data-act="runCue" data-p="' +
+        esc(JSON.stringify({ index: c.index })) +
+        '"><span class="st">' +
+        esc(c.step) +
+        '</span>' +
+        esc(c.label) +
+        '</button></li>';
+    });
+    h += '</ol></details>';
+
+    // Enkeltknapper i samme rekkefølge som innslaget
+    h +=
+      '<h2>Start</h2><div class="grid">' +
+      btn('1. Forside', 'setView', { view: 'hero' }) +
+      btn('2. Hovedspørsmål', 'setView', { view: 'mainQuestion' }) +
+      btn(
+        '3. Åpne avstemning',
+        'openPoll',
+        { pollId: 'main-before', showQr: true },
+        { cls: 'gold', sub: 'Hovedspørsmål • ' + state.polls['main-before'].count + ' stemmer' }
+      ) +
+      btn('4. Lukk avstemning', 'closePoll', { pollId: 'main-before' }, { disabled: state.polls['main-before'].status !== 'open', sub: '→ debattregler' }) +
+      btn('5. Debattregler', 'setView', { view: 'rules' }) +
+      btn('6. Introvideo Nord', 'playVideo', { key: 'introNorth' }, { cls: 'blue', sub: '→ tilbake til regler' }) +
+      btn('7. Introvideo Sør', 'playVideo', { key: 'introSouth' }, { cls: 'red span2', sub: '→ påstand 1' }) +
+      '</div>';
+
+    h += '<h2>Velg påstand</h2><div class="seg">';
+    [1, 2, 3].forEach(function (i) {
+      h += btn('Påstand ' + i, 'selectStatement', { statementNo: i }, { cls: i === n ? 'on' : '' });
+    });
+    h +=
+      '</div><p class="small muted" style="margin:6px 4px 0">' +
+      esc(s.text || '') +
+      '<br>' +
+      esc(teamName('north')) +
+      ': <b>' +
+      pos(s.northPosition) +
+      '</b> • ' +
+      esc(teamName('south')) +
+      ': <b>' +
+      pos(s.southPosition) +
+      '</b></p>';
+
+    var before = 's' + n + '-before';
+    var after = 's' + n + '-after';
+    /** @param {string} id */
+    var pollSub = function (id) {
+      return state.polls[id].count + ' stemmer • ' + STATUS_LABEL[/** @type {'open'} */ (state.polls[id].status)];
+    };
+    h +=
+      '<h2>Påstand ' +
+      n +
+      '</h2><div class="grid">' +
+      btn('Ekstravideo ' + n, 'playVideo', { key: 'extra' + n }, { sub: '→ påstand ' + n }) +
+      btn('Vis påstand ' + n, 'showStatement', { statementNo: n }, { cls: 'gold' }) +
+      btn('Åpne før-avstemning', 'openPoll', { pollId: before, showQr: true }, { cls: 'gold', sub: pollSub(before) }) +
+      btn('Lukk før-avstemning', 'closePoll', { pollId: before }, { disabled: state.polls[before].status !== 'open', sub: '→ påstand ' + n }) +
+      btn('Åpningsinnlegg Nord', 'startSegment', { kind: 'opening', team: 'north' }, { cls: 'blue', sub: T.format(d.opening) + ' • går i minus' }) +
+      btn('Åpningsinnlegg Sør', 'startSegment', { kind: 'opening', team: 'south' }, { cls: 'red', sub: T.format(d.opening) + ' • går i minus' }) +
+      btn('Kryssforhør Nord', 'startSegment', { kind: 'cross', team: 'north' }, { cls: 'blue', sub: T.format(d.cross) + ' • går i minus' }) +
+      btn('Kryssforhør Sør', 'startSegment', { kind: 'cross', team: 'south' }, { cls: 'red', sub: T.format(d.cross) + ' • går i minus' }) +
+      btn('Sluttappell Nord', 'startSegment', { kind: 'closing', team: 'north' }, { cls: 'blue', sub: T.format(d.closing) + ' • → påstand' }) +
+      btn('Sluttappell Sør', 'startSegment', { kind: 'closing', team: 'south' }, { cls: 'red', sub: T.format(d.closing) + ' • → påstand' }) +
+      btn('Tilbake til påstand ' + n, 'showStatement', { statementNo: n }, { cls: 'span2' }) +
+      btn('Åpne etter-avstemning', 'openPoll', { pollId: after, showQr: true }, { cls: 'gold', sub: pollSub(after) }) +
+      btn('Lukk etter-avstemning', 'closePoll', { pollId: after }, { disabled: state.polls[after].status !== 'open', sub: '→ resultat runde ' + n }) +
+      btn('Vis resultat runde ' + n, 'showResult', { statementNo: n }, { cls: 'green' }) +
+      btn('Vis leaderboard', 'setView', { view: 'leaderboard' }, { cls: 'green' }) +
+      '</div>';
+
+    h +=
+      '<h2>Avslutning</h2><div class="grid">' +
+      btn('20. Kår vinner', 'setView', { view: 'winner' }, { cls: 'green span2' }) +
+      btn(
+        '21. Åpne avstemning',
+        'openPoll',
+        { pollId: 'main-after', showQr: true },
+        { cls: 'gold', sub: 'Hovedspørsmål etter • ' + state.polls['main-after'].count + ' stemmer' }
+      ) +
+      btn(
+        '22. Lukk avstemning',
+        'closePoll',
+        { pollId: 'main-after' },
+        { disabled: state.polls['main-after'].status !== 'open', sub: '→ resultat hovedspørsmål' }
+      ) +
+      '</div>';
+
+    h +=
+      '<h2>Annet</h2><div class="grid">' +
+      btn(
+        'Lukk aktiv avstemning',
+        'closePoll',
+        {},
+        { disabled: !(p && p.status === 'open'), sub: p && p.status === 'open' ? POLL_NAMES[/** @type {'s1-before'} */ (p.id)] : 'Ingen åpen' }
+      ) +
+      btn('Vis QR-kode', 'showQr', {}) +
+      btn('Vis Lag Nord', 'showTeam', { team: 'north' }, { cls: 'blue' }) +
+      btn('Vis Lag Sør', 'showTeam', { team: 'south' }, { cls: 'red' }) +
+      btn('Svart skjerm', 'setView', { view: 'black' }, { cls: 'danger span2' }) +
+      '</div>';
+    setHtml('tab-run', h);
+    var det = document.querySelector('#tab-run details.cueList');
+    if (det) {
+      det.addEventListener('toggle', function () {
+        cueListOpen = /** @type {HTMLDetailsElement} */ (det).open;
+      });
+    }
+  }
+  var cueListOpen = false;
+
+  /** @param {any} p */
+  function bars(p) {
+    if (!p.distribution) return '';
+    return (
+      '<div class="bars">' +
+      CH.map(function (c) {
+        var n = p.distribution[c] || 0;
+        var pct = p.count ? Math.round((n / p.count) * 100) : 0;
+        return '<div class="' + c + '"><span>' + esc(p.labels[c]) + '</span><i style="width:' + pct + '%"></i><span class="num">' + n + '</span></div>';
+      }).join('') +
+      '</div>'
+    );
+  }
+
+  /** @param {string} id */
+  function pollCard(id) {
+    var p = state.polls[id];
+    var h =
+      '<div class="card pollRow"><div class="pollHead"><b>' +
+      esc(POLL_NAMES[/** @type {'s1-before'} */ (id)]) +
+      '</b><span><span class="num">' +
+      p.count +
+      '</span> <span class="pill ' +
+      p.status +
+      '">' +
+      STATUS_LABEL[/** @type {'open'} */ (p.status)] +
+      '</span></span></div>';
+    if (p.demo) h += '<div class="small" style="color:var(--gold)">Inkluderer ' + p.demo + ' demostemmer</div>';
+    h += bars(p);
+    h += '<div class="grid grid3">';
+    if (p.status === 'open') h += btn('Lukk', 'closePoll', { pollId: id }, { cls: 'gold' });
+    else h += btn(p.status === 'closed' ? 'Åpne igjen' : 'Åpne', 'openPoll', { pollId: id, showQr: true }, { cls: 'green' });
+    h += btn('Vis QR', 'showQr', { pollId: id });
+    h += btn(
+      'Nullstill',
+      'resetPoll',
+      { pollId: id },
+      {
+        cls: 'danger',
+        title: 'Nullstill avstemning',
+        confirm:
+          'Alle ' +
+          p.count +
+          ' stemmer i «' +
+          POLL_NAMES[/** @type {'s1-before'} */ (id)] +
+          '» slettes, og et eventuelt rundeResultat fjernes. Dette kan ikke angres.'
+      }
+    );
+    h += '</div></div>';
+    return h;
+  }
+
+  var qrLinksHtml = '';
+  function renderPoll() {
+    var p = activePoll();
+    var h = '<h2>Aktiv avstemning</h2><div class="card">';
+    if (p) {
+      h +=
+        '<div class="pollHead"><b>' +
+        esc(POLL_NAMES[/** @type {'s1-before'} */ (p.id)]) +
+        '</b><span class="pill ' +
+        p.status +
+        '">' +
+        STATUS_LABEL[/** @type {'open'} */ (p.status)] +
+        '</span></div>' +
+        '<div class="bigTimer" aria-live="polite">' +
+        p.count +
+        '<span class="small muted" style="font-size:16px;letter-spacing:0"> stemmer</span></div>';
+      h +=
+        '<div class="grid">' +
+        (p.status === 'open'
+          ? btn('Lukk avstemning', 'closePoll', { pollId: p.id }, { cls: 'gold big' })
+          : btn('Åpne igjen', 'reopenPoll', { pollId: p.id }, { cls: 'green big' })) +
+        btn('Vis QR på skjerm', 'showQr', { pollId: p.id }, { cls: 'big' }) +
+        btn(
+          state.revealDistribution ? 'Skjul fordeling på skjerm' : 'Vis fordeling på skjerm',
+          'setReveal',
+          { reveal: !state.revealDistribution },
+          { cls: 'span2' + (state.revealDistribution ? ' on' : '') }
+        ) +
+        '</div>';
+      h += '<p class="small muted">Fordelingen er skjult på storskjermen til du velger å vise den. I kontrollflaten vises den når avstemningen er lukket.</p>';
+    } else {
+      h += '<p class="muted">Ingen avstemning er aktiv.</p>';
+    }
+    h += '</div>';
+    h += '<h2>Hovedspørsmålet</h2>' + pollCard('main-before') + pollCard('main-after');
+    [1, 2, 3].forEach(function (n) {
+      h += '<h2>Påstand ' + n + '</h2>' + pollCard('s' + n + '-before') + pollCard('s' + n + '-after');
+    });
+    if (!qrLinksHtml) {
+      var items = [
+        ['main', 'Hovedspørsmålet'],
+        ['s1', 'Påstand 1'],
+        ['s2', 'Påstand 2'],
+        ['s3', 'Påstand 3']
+      ];
+      qrLinksHtml =
+        '<div class="qrs">' +
+        items
+          .map(function (it) {
+            var url = cl.voteUrl(it[0]);
+            var svg = '';
+            try {
+              svg = Q.toSvg(url, { margin: 2 });
+            } catch (e) {
+              svg = '';
+            }
+            return (
+              '<div class="qrItem">' +
+              svg +
+              '<div>' +
+              esc(it[1]) +
+              '</div><a href="' +
+              esc(url) +
+              '" target="_blank" rel="noopener">Åpne</a> • ' +
+              '<a href="#" data-act="ui:copy" data-p="' +
+              esc(JSON.stringify({ url: url })) +
+              '">Kopier</a></div>'
+            );
+          })
+          .join('') +
+        '</div>';
+    }
+    h +=
+      '<h2>Reserve: direktelenker</h2><details class="card"><summary>Vis separate QR-koder</summary><p class="small muted">Hovedlenken på storskjermen åpner alltid den aktive avstemningen. Disse lenkene låser seg til ett spørsmål og viser før- eller etter-avstemningen som er åpen.</p>' +
+      qrLinksHtml +
+      '<p class="small muted" style="word-break:break-all">Fast lenke: ' +
+      esc(cl.voteUrl()) +
+      '</p></details>';
+    var open = document.querySelector('#tab-poll details');
+    var wasOpen = open && /** @type {HTMLDetailsElement} */ (open).open;
+    if (!setHtml('tab-poll', h)) return;
+    if (wasOpen) /** @type {HTMLDetailsElement} */ (document.querySelector('#tab-poll details')).open = true;
+  }
+
+  function renderTimer() {
+    var t = state.timer;
+    var h =
+      '<h2>Timer</h2><div class="card"><div id="bigTimer" class="bigTimer">--:--</div>' +
+      '<div class="small muted" style="text-align:center;margin-bottom:10px">Status: <b id="timerStatus"></b></div><div class="grid">';
+    if (t.status === 'running') h += btn('Pause', 'timerPause', {}, { cls: 'gold big' });
+    else if (t.status === 'paused') h += btn('Fortsett', 'timerResume', {}, { cls: 'green big' });
+    else h += btn('Start', 'timerStart', {}, { cls: 'green big' });
+    h +=
+      btn('Nullstill', 'timerReset', {}, { cls: 'big' }) +
+      btn('−10 sek', 'timerAdjust', { delta: -10 }) +
+      btn('+10 sek', 'timerAdjust', { delta: 10 }) +
+      btn('+1 minutt', 'timerAdjust', { delta: 60 }, { cls: 'span2 gold' }) +
+      '</div></div>';
+    h +=
+      '<h2>Valgfri tid</h2><div class="card"><div class="grid"><div><label for="tMin">Minutter</label><input id="tMin" type="number" inputmode="numeric" min="0" value="' +
+      (Number(cl.storage.get('isq-tmin')) || 2) +
+      '"></div><div><label for="tSec">Sekunder</label><input id="tSec" type="number" inputmode="numeric" min="0" max="59" value="' +
+      (Number(cl.storage.get('isq-tsec')) || 0) +
+      '"></div>' +
+      btn('Sett tid', 'ui:customTime', {}) +
+      btn('Start med tiden', 'ui:customStart', {}, { cls: 'green' }) +
+      '</div></div>';
+    var d = state.settings.durations;
+    h +=
+      '<h2>Debattdeler</h2><div class="grid">' +
+      btn('Åpningsinnlegg Nord', 'startSegment', { kind: 'opening', team: 'north' }, { cls: 'blue', sub: T.format(d.opening) }) +
+      btn('Åpningsinnlegg Sør', 'startSegment', { kind: 'opening', team: 'south' }, { cls: 'red', sub: T.format(d.opening) }) +
+      btn('Kryssforhør Nord', 'startSegment', { kind: 'cross', team: 'north' }, { cls: 'blue', sub: T.format(d.cross) }) +
+      btn('Kryssforhør Sør', 'startSegment', { kind: 'cross', team: 'south' }, { cls: 'red', sub: T.format(d.cross) }) +
+      btn('Sluttappell Nord', 'startSegment', { kind: 'closing', team: 'north' }, { cls: 'blue', sub: T.format(d.closing) }) +
+      btn('Sluttappell Sør', 'startSegment', { kind: 'closing', team: 'south' }, { cls: 'red', sub: T.format(d.closing) }) +
+      '</div><p class="small muted">' +
+      (state.settings.autoStartTimer ? 'Timeren starter automatisk når en debattdel vises.' : 'Timeren lastes, men må startes manuelt.') +
+      '</p>';
+    var mi = document.activeElement && /** @type {HTMLElement} */ (document.activeElement).id;
+    if (mi === 'tMin' || mi === 'tSec') {
+      cl.storage.set('isq-tmin', $('tMin').value);
+      cl.storage.set('isq-tsec', $('tSec').value);
+      // Ikke tegn skjemaet på nytt mens brukeren skriver
+      return;
+    }
+    setHtml('tab-timer', h);
+    tickTimers();
+  }
+  document.addEventListener('input', function (e) {
+    var id = /** @type {HTMLElement} */ (e.target).id;
+    if (id === 'tMin' || id === 'tSec') cl.storage.set(id === 'tMin' ? 'isq-tmin' : 'isq-tsec', /** @type {HTMLInputElement} */ (e.target).value);
+  });
+
+  function renderCards() {
+    var h = '';
+    ['north', 'south'].forEach(function (team) {
+      h += '<h2>' + esc(teamName(team)) + '</h2><div class="grid grid1">';
+      C.CARDS.forEach(function (c) {
+        var used = state.cards[team][c.key];
+        if (used) {
+          h +=
+            '<button type="button" class="btn cardBtn used" data-act="revertCard" data-p="' +
+            esc(JSON.stringify({ id: used.id })) +
+            '" data-title="Angre kortbruk" data-confirm="' +
+            esc('Registrer ' + c.name + ' for ' + teamName(team) + ' som ubrukt igjen?' + (c.key === 'green' ? ' Ekstraminuttet trekkes fra timeren.' : '')) +
+            '">' +
+            '<span class="ic" aria-hidden="true">' +
+            c.icon +
+            '</span><span>' +
+            esc(c.name + ' – ' + c.title) +
+            '<small>Brukt kl. ' +
+            clock(used.usedAt) +
+            ' • trykk for å angre</small></span></button>';
+        } else {
+          h +=
+            '<button type="button" class="btn cardBtn ' +
+            (team === 'north' ? 'blue' : 'red') +
+            '" data-act="useCard" data-p="' +
+            esc(JSON.stringify({ team: team, key: c.key })) +
+            '">' +
+            '<span class="ic" aria-hidden="true">' +
+            c.icon +
+            '</span><span>' +
+            esc(c.name + ' – ' + c.title) +
+            '<small>' +
+            esc(c.text) +
+            '</small></span></button>';
+        }
+      });
+      h += '</div>';
+    });
+    h += '<h2>Skjerm</h2><div class="grid">' + btn('Vis spillekort og regler', 'setView', { view: 'rules' }, { cls: 'span2' }) + '</div>';
+    setHtml('tab-cards', h);
+  }
+
+  function renderResults() {
+    var lb = state.leaderboard;
+    var h =
+      '<h2>Leaderboard</h2><div class="card"><div class="score"><div><div class="north"><b>' +
+      esc(teamName('north')) +
+      '</b></div><div class="n north">' +
+      lb.north +
+      '</div></div><div><div class="south"><b>' +
+      esc(teamName('south')) +
+      '</b></div><div class="n south">' +
+      lb.south +
+      '</div></div></div>' +
+      '<p class="small muted" style="text-align:center">Netto flyttede stemmesteg, kun godkjente runder.</p><div class="grid">' +
+      btn('Vis leaderboard', 'setView', { view: 'leaderboard' }, { cls: 'green span2' }) +
+      '</div></div>';
+
+    [1, 2, 3].forEach(function (n) {
+      var s = statement(n);
+      var r = state.results[String(n)];
+      var b = state.polls['s' + n + '-before'];
+      var a = state.polls['s' + n + '-after'];
+      h += '<h2>Påstand ' + n + ' • ' + esc(s.short) + '</h2><div class="card">';
+      h +=
+        '<div class="small muted">' +
+        esc(teamName('north')) +
+        ': <b>' +
+        pos(s.northPosition) +
+        '</b> • ' +
+        esc(teamName('south')) +
+        ': <b>' +
+        pos(s.southPosition) +
+        '</b></div>';
+      h +=
+        '<div class="small" style="margin:6px 0">Før: <b class="num">' +
+        b.count +
+        '</b> (' +
+        STATUS_LABEL[/** @type {'open'} */ (b.status)] +
+        ') • Etter: <b class="num">' +
+        a.count +
+        '</b> (' +
+        STATUS_LABEL[/** @type {'open'} */ (a.status)] +
+        ')</div>';
+      if (r) {
+        var modeTxt = r.mode === 'normalized' ? 'Normalisert' : r.mode === 'manual' ? 'Manuelt overstyrt' : 'Standard';
+        h +=
+          '<div class="row"><span class="pill ' +
+          r.status +
+          '">' +
+          (r.status === 'approved' ? 'I LEADERBOARD' : 'VENTER PÅ AVGJØRELSE') +
+          '</span><span class="small muted">' +
+          modeTxt +
+          (r.demo ? ' • DEMO' : '') +
+          '</span></div>';
+        if (r.mode !== 'manual') {
+          h +=
+            '<div class="small" style="margin-top:8px">Før: MOT ' +
+            r.before.against +
+            ' / NØYTRAL ' +
+            r.before.neutral +
+            ' / FOR ' +
+            r.before['for'] +
+            ' (score ' +
+            r.beforeScore +
+            ')<br>' +
+            'Etter: MOT ' +
+            r.after.against +
+            ' / NØYTRAL ' +
+            r.after.neutral +
+            ' / FOR ' +
+            r.after['for'] +
+            ' (score ' +
+            r.afterScore +
+            ')<br>' +
+            'Netto flyttede stemmesteg: <b class="num">' +
+            (r.netMovement > 0 ? '+' : '') +
+            r.netMovement +
+            '</b>' +
+            (r.mode === 'normalized' ? ' (rå: ' + r.rawNetMovement + ')' : '') +
+            '</div>';
+        } else {
+          h += '<div class="small" style="margin-top:8px">Begrunnelse: ' + esc(r.overrideReason || '') + '</div>';
+        }
+        if (r.status === 'pending') h += '<div class="small muted" style="margin-top:8px">Foreløpig standardberegning – ikke godkjent:</div>';
+        h +=
+          '<div class="score" style="margin-top:8px"><div><div class="small north">Nord</div><div class="n north" style="font-size:32px">' +
+          r.north +
+          '</div></div><div><div class="small south">Sør</div><div class="n south" style="font-size:32px">' +
+          r.south +
+          '</div></div></div>';
+        if (r.status === 'pending') {
+          h +=
+            '<div class="warnBox"><b>⚠︎ Ulikt antall stemmer før (' +
+            r.beforeTotal +
+            ') og etter (' +
+            r.afterTotal +
+            ').</b><br>Resultatet er ikke lagt til i leaderboardet. Velg:</div><div class="grid grid1">' +
+            btn('1. Vent på flere stemmer', 'reopenPoll', { pollId: 's' + n + '-after' }, { sub: 'Åpner etter-avstemningen igjen' }) +
+            btn(
+              '2. Godkjenn normalisert beregning',
+              'approveResult',
+              { statementNo: n, mode: 'normalized' },
+              { cls: 'gold', sub: 'Merkes tydelig som normalisert' }
+            ) +
+            btn('3. Overstyr resultat manuelt', 'ui:override', { statementNo: n }, { cls: 'danger' }) +
+            '</div>';
+        }
+      } else {
+        h += '<p class="small muted">Ikke beregnet.</p>';
+      }
+      h +=
+        '<div class="grid" style="margin-top:8px">' +
+        btn(
+          r ? 'Beregn på nytt' : 'Beregn resultat',
+          'computeResult',
+          { statementNo: n },
+          { cls: 'green', disabled: b.status !== 'closed' || a.status !== 'closed' }
+        ) +
+        btn('Vis på skjerm', 'showResult', { statementNo: n }, { disabled: !r }) +
+        (r && r.status === 'approved' ? btn('Overstyr', 'ui:override', { statementNo: n }) : '') +
+        (r
+          ? btn(
+              'Fjern resultat',
+              'clearResult',
+              { statementNo: n },
+              { cls: 'danger', title: 'Fjern resultat', confirm: 'Resultatet for påstand ' + n + ' fjernes fra leaderboardet. Stemmene beholdes.' }
+            )
+          : '') +
+        '</div></div>';
+    });
+
+    var m = state.mainResult;
+    h += '<h2>Hovedspørsmålet (teller ikke)</h2><div class="card">';
+    if (m) {
+      h +=
+        '<div class="small">Før (' +
+        m.beforeTotal +
+        '): ' +
+        CH.map(function (c) {
+          return esc(m.labels[c]) + ' ' + m.before[c];
+        }).join(' / ') +
+        '<br>' +
+        'Etter (' +
+        m.afterTotal +
+        '): ' +
+        CH.map(function (c) {
+          return esc(m.labels[c]) + ' ' + m.after[c];
+        }).join(' / ') +
+        '</div>';
+    }
+    h += '<div class="grid" style="margin-top:8px">' + btn('Vis hovedresultat', 'setView', { view: 'mainResult' }, { cls: 'green span2' }) + '</div></div>';
+    setHtml('tab-results', h);
+  }
+
+  function renderMedia() {
+    var d = state.display;
+    var h = '<h2>Publikumsskjerm</h2><div class="card">';
+    if (d) {
+      var ago = Math.max(0, Math.round((cl.serverNow() - d.at) / 1000));
+      var ok = ago < 30;
+      h +=
+        '<div class="row"><span><span class="dot' +
+        (ok ? '' : ' off') +
+        '"></span> ' +
+        (ok ? 'Tilkoblet' : 'Ikke sett på ' + ago + ' s') +
+        '</span><span class="small muted">sist sett for ' +
+        ago +
+        ' s siden</span></div>';
+      if (d.missing) h += '<div class="warnBox small"><b>Mangler filer i skjermmappen:</b><br>' + esc(d.missing) + '</div>';
+      else h += '<div class="small muted" style="margin-top:6px">Ingen manglende mediefiler rapportert.</div>';
+    } else {
+      h += '<p class="small muted">Publikumsskjermen har ikke meldt seg ennå. Åpne index.html i skjermmappen på Mac-en og trykk «Start publikumsskjerm».</p>';
+    }
+    h += '</div>';
+
+    var v = state.video;
+    h += '<h2>Video nå</h2><div class="card">';
+    if (v) {
+      var vid = C.VIDEOS.filter(function (x) {
+        return x.key === v.key;
+      })[0];
+      h +=
+        '<div class="row"><b>' +
+        esc(vid ? vid.label : v.key) +
+        '</b><span class="pill ' +
+        (v.status === 'playing' ? 'open' : 'closed') +
+        '">' +
+        (v.status === 'playing' ? 'SPILLER' : 'PAUSE') +
+        '</span></div><div class="grid" style="margin-top:8px">' +
+        (v.status === 'playing' ? btn('Pause', 'pauseVideo', {}, { cls: 'gold big' }) : btn('Fortsett', 'resumeVideo', {}, { cls: 'green big' })) +
+        btn('Stopp', 'stopVideo', {}, { cls: 'danger big' }) +
+        '</div><p class="small muted">Når videoen er ferdig, går skjermen tilbake til forrige visning.</p>';
+    } else {
+      h += '<p class="small muted">Ingen video spilles.</p>';
+    }
+    h += '</div><h2>Videoer</h2><div class="grid">';
+    C.VIDEOS.forEach(function (x) {
+      h += btn(x.label, 'playVideo', { key: x.key }, { cls: x.team === 'north' ? 'blue' : x.team === 'south' ? 'red' : '' });
+    });
+    h += '</div><h2>Musikk</h2><div class="grid">';
+    C.MUSIC.forEach(function (x) {
+      h += btn(x.label, 'playMusic', { key: x.key }, { cls: state.music && state.music.key === x.key ? 'on' : '' });
+    });
+    h += btn('Stopp musikk', 'stopMusic', {}, { cls: 'danger', disabled: !state.music }) + '</div>';
+    h +=
+      '<h2>Skjerm</h2><div class="grid">' +
+      btn('Svart skjerm', 'setView', { view: 'black' }, { cls: 'danger' }) +
+      btn('Vis hero', 'setView', { view: 'hero' }) +
+      '</div>' +
+      '<p class="small muted">Fullskjerm styres på Mac-en: klikk «Start publikumsskjerm» eller trykk F i skjermvinduet.</p>';
+    setHtml('tab-media', h);
+  }
+
+  function renderAdmin() {
+    var logHtml = (state.log || [])
+      .map(function (/** @type {any} */ l) {
+        return esc(clock(l.at) + '  ' + l.actor + '  ' + l.action + '  ' + (typeof l.payload === 'string' ? l.payload : JSON.stringify(l.payload || {})));
+      })
+      .join('<br>');
+    if (adminRendered) {
+      var logEl = $('auditLog');
+      if (logEl) logEl.innerHTML = logHtml || 'Ingen hendelser.';
+      var st = $('statusNow');
+      if (st) st.textContent = state.event.statusLabel;
+      return;
+    }
+    var e = state.eventConfig;
+    var s = state.settings;
+    var h =
+      '<h2>Arrangement</h2><div class="card">' +
+      '<label for="aTitle">Tittel</label><input id="aTitle" value="' +
+      esc(e.title) +
+      '">' +
+      '<label for="aHero">Tittel på forsiden</label><input id="aHero" value="' +
+      esc(e.heroTitle || '') +
+      '">' +
+      '<label for="aKicker">Overtekst</label><input id="aKicker" value="' +
+      esc(e.kicker) +
+      '">' +
+      '<label for="aMain">Hovedspørsmål</label><textarea id="aMain">' +
+      esc(e.mainQuestion) +
+      '</textarea>' +
+      '<div class="grid wide3"><div><label for="aLA">Svar 1 (MOT-siden)</label><input id="aLA" value="' +
+      esc(e.mainLabels.against) +
+      '"></div>' +
+      '<div><label for="aLN">Svar 2 (nøytral)</label><input id="aLN" value="' +
+      esc(e.mainLabels.neutral) +
+      '"></div>' +
+      '<div><label for="aLF">Svar 3 (FOR-siden)</label><input id="aLF" value="' +
+      esc(e.mainLabels['for']) +
+      '"></div></div>' +
+      '<label for="aSlug">Arrangement-ID (brukes i ?event=)</label><input id="aSlug" value="' +
+      esc(e.slug) +
+      '" autocapitalize="off">' +
+      '<div style="height:10px"></div>' +
+      btn('Lagre arrangement', 'ui:saveEvent', {}, { cls: 'green' }) +
+      '</div>';
+
+    h += '<h2>Påstander og lagposisjoner</h2>';
+    state.statements.forEach(function (/** @type {any} */ st) {
+      var n = st.no;
+      /** @param {string} id @param {string} v */
+      var sel = function (id, v) {
+        return (
+          '<select id="' +
+          id +
+          '"><option value="for"' +
+          (v === 'for' ? ' selected' : '') +
+          '>FOR</option><option value="against"' +
+          (v === 'against' ? ' selected' : '') +
+          '>MOT</option></select>'
+        );
+      };
+      h +=
+        '<div class="card"><b>Påstand ' +
+        n +
+        '</b><label for="sT' +
+        n +
+        '">Tekst</label><textarea id="sT' +
+        n +
+        '">' +
+        esc(st.text) +
+        '</textarea>' +
+        '<label for="sS' +
+        n +
+        '">Kortnavn</label><input id="sS' +
+        n +
+        '" value="' +
+        esc(st.short) +
+        '">' +
+        '<div class="grid"><div><label for="sN' +
+        n +
+        '">' +
+        esc(teamName('north')) +
+        '</label>' +
+        sel('sN' + n, st.northPosition) +
+        '</div>' +
+        '<div><label for="sP' +
+        n +
+        '">' +
+        esc(teamName('south')) +
+        '</label>' +
+        sel('sP' + n, st.southPosition) +
+        '</div></div>' +
+        '<div style="height:10px"></div>' +
+        btn('Lagre påstand ' + n, 'ui:saveStatement', { statementNo: n }, { cls: 'green' }) +
+        '</div>';
+    });
+
+    var d = s.durations;
+    h +=
+      '<h2>Innstillinger</h2><div class="card">' +
+      '<label class="check"><input type="checkbox" id="setSound"' +
+      (s.soundEnabled ? ' checked' : '') +
+      '> Lydsignal når timeren når 0</label>' +
+      '<label class="check"><input type="checkbox" id="setAuto"' +
+      (s.autoStartTimer ? ' checked' : '') +
+      '> Start timer automatisk ved debattdel</label>' +
+      '<label class="check"><input type="checkbox" id="setEqual"' +
+      (s.requireEqualTurnout !== false ? ' checked' : '') +
+      '> Krev likt antall stemmer før og etter (anbefalt)</label>' +
+      '<div class="grid"><div><label for="dOpen">Åpningsinnlegg (sek)</label><input id="dOpen" type="number" inputmode="numeric" value="' +
+      d.opening +
+      '"></div>' +
+      '<div><label for="dCross">Kryssforhør (sek)</label><input id="dCross" type="number" inputmode="numeric" value="' +
+      d.cross +
+      '"></div>' +
+      '<div><label for="dClose">Sluttappell (sek)</label><input id="dClose" type="number" inputmode="numeric" value="' +
+      d.closing +
+      '"></div>' +
+      '<div><label for="dTeam">Lagpresentasjon (sek)</label><input id="dTeam" type="number" inputmode="numeric" value="' +
+      d.team +
+      '"></div></div>' +
+      '<div style="height:10px"></div>' +
+      btn('Lagre innstillinger', 'ui:saveSettings', {}, { cls: 'green' }) +
+      '</div>';
+
+    h +=
+      '<h2>Demo-modus</h2><div class="card"><p class="small muted">Genererer merkede eksempelstemmer slik at hele flyten kan testes uten publikum. Storskjermen viser «DEMO» mens demodata finnes.</p>' +
+      '<label for="demoPoll">Avstemning</label><select id="demoPoll">' +
+      C.POLL_IDS.map(function (id) {
+        return (
+          '<option value="' +
+          id +
+          '"' +
+          (id === (state.poll && state.poll.id) ? ' selected' : '') +
+          '>' +
+          esc(POLL_NAMES[/** @type {'s1-before'} */ (id)]) +
+          '</option>'
+        );
+      }).join('') +
+      '</select><label for="demoCount">Antall (tomt = 40, eller samme som før-avstemningen)</label><input id="demoCount" type="number" inputmode="numeric" min="1" max="500">' +
+      '<div class="grid" style="margin-top:10px">' +
+      btn('Generer demostemmer', 'ui:demo', {}, { cls: 'gold' }) +
+      btn(
+        'Slett alle demodata',
+        'clearDemo',
+        {},
+        { cls: 'danger', title: 'Slett demodata', confirm: 'Alle demostemmer og resultater beregnet med demostemmer slettes. Ekte stemmer beholdes.' }
+      ) +
+      '</div></div>';
+
+    h +=
+      '<h2>Lenker</h2><div class="card small" style="word-break:break-all">Stemmeside: <a href="' +
+      esc(cl.voteUrl()) +
+      '" target="_blank" rel="noopener" style="color:var(--north)">' +
+      esc(cl.voteUrl()) +
+      '</a>' +
+      '<br><br>Supabase (config.js): <b>' +
+      esc(BOOT.supabaseUrl || '') +
+      '</b><br>Nettsted (siteUrl): <b>' +
+      esc(cl.siteBase()) +
+      '</b></div>';
+
+    h += '<h2>Audit-logg</h2><div class="card"><div class="log" id="auditLog">' + (logHtml || 'Ingen hendelser.') + '</div></div>';
+
+    h +=
+      '<h2>Farlig sone</h2><div class="card"><div class="grid grid1">' +
+      btn(
+        'Nullstill hele arrangementet',
+        'resetEvent',
+        {},
+        {
+          cls: 'danger big',
+          title: 'Nullstill arrangement',
+          typed: 'NULLSTILL',
+          confirm: 'Alle stemmer, resultater, kortbruk og timer slettes. Innstillinger og påstander beholdes. Dette kan ikke angres.'
+        }
+      ) +
+      btn('Last inn verdier på nytt', 'ui:reloadAdmin', {}) +
+      btn('Logg ut', 'ui:logout', {}) +
+      '</div></div>';
+    setHtml('tab-admin', h);
+    adminRendered = /** @type {any} */ ($('tab-admin')).__html === h;
+  }
+
+  // ---------- Timer-visning ----------
+  function tickTimers() {
+    if (!state) return;
+    var sec = T.remainingMs(state.timer, cl.serverNow()) / 1000;
+    var signedSec = T.signedRemainingMs(state.timer, cl.serverNow()) / 1000;
+    var ph = T.phase(sec);
+    var seg = state.segment;
+    var cfg = seg && C.SEGMENTS[seg.kind];
+    var over = !!(cfg && cfg.overtime && state.timer.status === 'running' && signedSec <= -1);
+    var text = over ? T.formatSigned(signedSec) : ph === 'done' ? 'TID' : T.format(sec);
+    $('chipTimer').textContent = text;
+    $('chipTimerK').textContent = state.timer.status === 'running' ? 'Timer • går' : state.timer.status === 'paused' ? 'Timer • pause' : 'Timer';
+    var box = $('chipTimerBox');
+    box.classList.toggle('warn', ph === 'warn');
+    box.classList.toggle('danger', ph === 'danger' || ph === 'done' || over);
+    var big = $('bigTimer');
+    if (big) {
+      big.textContent = text;
+      big.className = 'bigTimer ' + (over ? 'over' : ph);
+      $('timerStatus').textContent = state.timer.status === 'running' ? 'går' : state.timer.status === 'paused' ? 'pause' : 'klar';
+    }
+  }
+  setInterval(tickTimers, 200);
+  setInterval(function () {
+    if (state && currentTab === 'media') renderMedia();
+  }, 5000);
+
+  // ---------- Oppstart ----------
+  if (session) start();
+  else showLogin();
+})();
+
+    </script>
+  </body>
+</html>

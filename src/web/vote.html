@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Stem • I-Squared Statsbygg</title>
+    <style>
+      <!--@css:base.css-->
+      <!--@css:vote.css-->
+    </style>
+    <!--@boot-->
+  </head>
+  <body>
+    <main class="wrap">
+      <header>
+        <div class="brand" id="title">I-Squared Statsbygg</div>
+      </header>
+
+      <section id="loading" class="panel" aria-live="polite">
+        <p class="muted">Henter avstemning …</p>
+      </section>
+
+      <section id="closed" class="panel" hidden aria-live="polite">
+        <div class="icon" aria-hidden="true">⏳</div>
+        <h1>Avstemningen er ikke åpen akkurat nå</h1>
+        <p class="muted" id="closedText">Siden oppdateres automatisk når neste avstemning åpner. Du trenger ikke skanne på nytt.</p>
+        <div class="spinner" aria-hidden="true"></div>
+      </section>
+
+      <section id="open" class="panel" hidden>
+        <div class="phase" id="phase"></div>
+        <h1 id="question"></h1>
+        <div class="choices" role="group" aria-labelledby="question" id="choices">
+          <button type="button" class="choice" data-choice="against"><span class="lbl" id="lbl-against">MOT</span></button>
+          <button type="button" class="choice" data-choice="neutral"><span class="lbl" id="lbl-neutral">NØYTRAL</span></button>
+          <button type="button" class="choice" data-choice="for"><span class="lbl" id="lbl-for">FOR</span></button>
+        </div>
+        <div id="confirm" class="confirm" role="status" aria-live="polite" hidden></div>
+        <div id="error" class="error" role="alert" hidden></div>
+      </section>
+
+      <footer class="muted small">Anonym avstemning. Vi lagrer ingen navn eller e-post.</footer>
+    </main>
+    <script>
+      <!--@js:client.js-->
+      <!--@js:vote.js-->
+    </script>
+  </body>
+</html>

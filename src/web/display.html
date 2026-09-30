@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Publikumsskjerm • I-Squared Statsbygg</title>
+    <style>
+      <!--@css:base.css-->
+      <!--@css:display.css-->
+    </style>
+    <!--@boot-->
+  </head>
+  <body>
+    <div id="start" role="dialog" aria-modal="true" aria-labelledby="startTitle">
+      <div>
+        <h1 id="startTitle">Publikumsskjerm</h1>
+        <p>
+          Klikk for å starte. Da slås lyd på og skjermen går i fullskjerm. Trykk <b>F</b> for fullskjerm senere,
+          <b>Esc</b> for å gå ut.
+        </p>
+        <p id="startWarn" class="warn" hidden></p>
+        <button id="startBtn" type="button">Start publikumsskjerm</button>
+      </div>
+    </div>
+
+    <div id="stage" aria-live="off">
+      <div id="bg" class="bg"></div>
+
+      <section id="v-hero" class="view hero" aria-label="Forside">
+        <div class="center">
+          <div class="kicker" id="heroKicker">Statsbygg presenterer</div>
+          <h1 id="heroTitle">I-<span>Squared</span></h1>
+          <div class="versus">
+            <span class="north" id="heroNorth">LAG NORD</span><span class="mot">mot</span
+            ><span class="south" id="heroSouth">LAG SØR</span><span class="mot">•</span
+            ><span>Publikum avgjør</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-mainQuestion" class="view statement" aria-label="Hovedspørsmål">
+        <div class="center">
+          <div class="nr">HOVEDSPØRSMÅL</div>
+          <h2 id="mqText"></h2>
+        </div>
+      </section>
+
+      <section id="v-statement" class="view statement" aria-label="Påstand">
+        <div class="center">
+          <div class="nr" id="stNr"></div>
+          <h2 id="stText"></h2>
+          <div class="positions" id="stPositions"></div>
+        </div>
+      </section>
+
+      <section id="v-qr" class="view" aria-label="Avstemning">
+        <div class="qrWrap">
+          <div class="qrText">
+            <div class="label" id="qrLabel"></div>
+            <h2 id="qrTitle"></h2>
+            <div class="scan">Skann for å stemme</div>
+            <div class="answers" id="qrAnswers"></div>
+            <div class="count" aria-live="polite"><strong id="qrCount">0</strong>stemmer mottatt</div>
+            <div id="qrState" class="pollState"></div>
+            <div class="dist" id="qrDist"></div>
+          </div>
+          <div class="qrBox" id="qrBox" aria-label="QR-kode til stemmesiden"></div>
+        </div>
+      </section>
+
+      <section id="v-speaker" class="view" aria-label="Taler">
+        <div id="speakerCard" class="speaker">
+          <div id="spPhoto" class="photo n"><img id="spImg" alt="" /><div class="fallback" id="spFallback">N</div></div>
+          <div class="speech">
+            <div id="spTeam" class="team north"></div>
+            <div id="spPhase" class="phase"></div>
+            <div id="spTimer" class="timer">03:00</div>
+            <div id="spStatement" class="smallStatement"></div>
+            <div><span id="spStance" class="stance"></span></div>
+            <div id="spCards" class="cards"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-cross" class="view cross" aria-label="Kryssforhør">
+        <div class="center">
+          <div class="kicker" id="crossLabel"></div>
+          <h2>KRYSSFORHØR</h2>
+          <div class="crossgrid">
+            <div id="crossN" class="teamBox"><strong class="north" id="crossNName">LAG NORD</strong><span class="tag" id="crossNTag"></span></div>
+            <div id="crossS" class="teamBox"><strong class="south" id="crossSName">LAG SØR</strong><span class="tag" id="crossSTag"></span></div>
+          </div>
+          <div id="crossTimer" class="timer">01:00</div>
+          <div class="crossStatement" id="crossStatement"></div>
+        </div>
+      </section>
+
+      <section id="v-result" class="view" aria-label="Avstemningsresultat">
+        <div class="result">
+          <div class="head">
+            <div class="kicker gold" id="resLabel"></div>
+            <h2 id="resText"></h2>
+          </div>
+          <div id="resBody"></div>
+        </div>
+      </section>
+
+      <section id="v-leaderboard" class="view board" aria-label="Leaderboard">
+        <div class="center">
+          <div class="kicker">Flyttede stemmer</div>
+          <h2>LEADERBOARD</h2>
+          <div class="scoregrid">
+            <div class="scoreBox" id="lbN">
+              <strong class="north" id="lbNName">LAG NORD</strong>
+              <div class="points north" id="lbNScore">0</div>
+              <div class="unit">FLYTTEDE STEMMER</div>
+              <div class="rounds" id="lbNRounds"></div>
+            </div>
+            <div class="scoreBox" id="lbS">
+              <strong class="south" id="lbSName">LAG SØR</strong>
+              <div class="points south" id="lbSScore">0</div>
+              <div class="unit">FLYTTEDE STEMMER</div>
+              <div class="rounds" id="lbSRounds"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-mainResult" class="view final" aria-label="Hovedresultat">
+        <div class="center" style="width: 100%">
+          <div class="kicker gold">HOVEDSPØRSMÅLET – FØR OG ETTER</div>
+          <div id="finalBody"></div>
+        </div>
+      </section>
+
+      <section id="v-rules" class="view rules" aria-label="Debattregler">
+        <div class="rulesWrap">
+          <div>
+            <div class="kicker gold">SLIK FUNGERER DEBATTEN</div>
+            <h2>DEBATTREGLER</h2>
+            <ol class="rulesFormat" id="rulesFormat"></ol>
+          </div>
+          <div>
+            <div class="kicker gold">SPILLEKORT – ÉN GANG PER LAG</div>
+            <div class="rulesGrid" id="rulesGrid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-winner" class="view winner" aria-label="Vinner av debatten">
+        <div class="center" id="winnerBody"></div>
+      </section>
+
+      <section id="v-video" class="view video" aria-label="Video">
+        <video id="player" playsinline muted preload="auto"></video>
+        <div id="videoMissing" class="videoMissing"></div>
+      </section>
+
+      <section id="v-black" class="view black" aria-label="Svart skjerm"></section>
+
+      <div id="flash" class="flash" role="alert">
+        <div>
+          <div id="flashIcon" class="flashIcon"></div>
+          <div id="flashTitle" class="flashTitle"></div>
+          <div id="flashText" class="flashText"></div>
+        </div>
+      </div>
+
+      <div class="status">
+        <span id="muted" class="muted" title="Nettleseren blokkerte lyd">🔇 Klikk for lyd</span>
+        <span id="demo" class="demo">DEMO</span>
+        <span id="offline" class="offline" role="status">⚠︎ Frakoblet – prøver igjen</span>
+      </div>
+    </div>
+    <audio id="music" loop preload="auto"></audio>
+    <audio id="soundtrack" preload="auto"></audio>
+
+    <script>
+      <!--@js:../shared/config.js-->
+      <!--@js:../shared/timer.js-->
+      <!--@js:../shared/qr.js-->
+      <!--@js:client.js-->
+      <!--@js:display.js-->
+    </script>
+  </body>
+</html>

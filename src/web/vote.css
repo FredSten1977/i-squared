@@ -1,0 +1,128 @@
+body {
+  min-height: 100vh;
+  background: radial-gradient(800px 500px at 10% -10%, #123049 0%, transparent 60%), var(--bg);
+}
+.wrap {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100vh;
+}
+header {
+  padding: 8px 0;
+}
+.brand {
+  font-weight: 950;
+  letter-spacing: -0.02em;
+  font-size: 22px;
+}
+.panel {
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px 18px;
+}
+.panel h1 {
+  font-size: 24px;
+  line-height: 1.3;
+  margin: 8px 0 20px;
+}
+.phase {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 13px;
+  text-align: center;
+  margin-top: auto;
+}
+.icon {
+  font-size: 44px;
+}
+.choices {
+  display: grid;
+  gap: 12px;
+}
+.choice {
+  font: inherit;
+  width: 100%;
+  min-height: 76px;
+  border-radius: 16px;
+  border: 2px solid #395069;
+  background: #1a2838;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition:
+    transform 0.08s,
+    background 0.2s,
+    border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.choice:active {
+  transform: scale(0.98);
+}
+.choice[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: #3a3212;
+}
+.choice[aria-pressed='true']::before {
+  content: '✓';
+  color: var(--gold);
+}
+.choice[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+.confirm {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #123824;
+  border: 1px solid #57d68d66;
+  color: #d9ffe8;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.confirm strong {
+  font-size: 18px;
+}
+.error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #3b1111;
+  border: 1px solid #ff654f88;
+  color: #ffd5cc;
+  font-weight: 700;
+}
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid #ffffff22;
+  border-top-color: var(--north);
+  animation: spin 1s linear infinite;
+  margin-top: 8px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

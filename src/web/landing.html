@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>I-Squared Statsbygg</title>
+    <style>
+      <!--@css:base.css-->
+      body { min-height: 100vh; background: radial-gradient(900px 600px at 10% -10%, #123049 0%, transparent 60%), var(--bg); }
+      main { max-width: 640px; margin: 0 auto; padding: 40px 16px; }
+      h1 { font-size: 44px; line-height: 1; letter-spacing: -0.04em; margin: 8px 0 12px; }
+      h1 span { color: var(--north); }
+      .kicker { color: var(--gold); font-weight: 900; letter-spacing: 0.16em; font-size: 13px; }
+      p { color: var(--muted); line-height: 1.5; }
+      nav { display: grid; gap: 10px; margin-top: 24px; }
+      a.card { display: block; padding: 18px; border-radius: 16px; background: var(--panel-solid); border: 1px solid var(--line); color: #fff; text-decoration: none; }
+      a.card b { font-size: 18px; display: block; }
+      a.card span { color: var(--muted); font-size: 14px; }
+    </style>
+    <!--@boot-->
+  </head>
+  <body>
+    <main>
+      <div class="kicker">STATSBYGG PRESENTERER</div>
+      <h1>I-Squared <span>Statsbygg</span></h1>
+      <p>Lag Nord mot Lag Sør. Velg hvilken flate du skal bruke.</p>
+      <nav aria-label="Flater">
+        <a class="card" id="lVote" href="#"><b>Stem</b><span>For publikum – åpner den aktive avstemningen</span></a>
+        <a class="card" id="lControl" href="#"><b>Kontrollflate</b><span>For operatør på mobil – krever PIN</span></a>
+        <a class="card" id="lAdmin" href="#"><b>Administrasjon</b><span>Oppsett, lagposisjoner, demo og logg – krever PIN</span></a>
+        <a class="card" id="lDisplay" href="#"><b>Publikumsskjerm (nettversjon)</b><span>Reserve uten lokale videoer. Bruk helst skjermmappen på Mac-en.</span></a>
+      </nav>
+    </main>
+    <script>
+      <!--@js:client.js-->
+      (function () {
+        var base = ISQ_Client.siteBase();
+        [['lVote', 'stem/'], ['lControl', 'kontroll/'], ['lAdmin', 'admin/'], ['lDisplay', 'skjerm/']].forEach(function (x) {
+          document.getElementById(x[0]).href = base + x[1];
+        });
+      })();
+    </script>
+  </body>
+</html>

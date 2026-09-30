@@ -1,0 +1,3346 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Publikumsskjerm • I-Squared Statsbygg</title>
+    <style>
+      /* Felles designtokens – videreført fra prototypen */
+:root {
+  --north: #55c8ff;
+  --north-deep: #0b5b80;
+  --south: #ff654f;
+  --south-deep: #7c251c;
+  --gold: #ffd166;
+  --green: #57d68d;
+  --bg: #07111c;
+  --bg-2: #0b1119;
+  --panel: rgba(7, 18, 31, 0.9);
+  --panel-solid: #131d29;
+  --line: #26374b;
+  --text: #f7fbff;
+  --muted: #a9bacb;
+  --focus: #ffd166;
+  --radius: 16px;
+  --font: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.north {
+  color: var(--north);
+}
+.south {
+  color: var(--south);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+      /* Publikumsskjerm – 1920×1080 scene som skaleres til skjermen */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  cursor: default;
+}
+body.hide-cursor {
+  cursor: none;
+}
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  overflow: hidden;
+  background: var(--bg);
+}
+.bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1200px 700px at 20% 10%, #123049 0%, transparent 60%), radial-gradient(900px 600px at 90% 90%, #3a1a1a 0%, transparent 60%), var(--bg);
+}
+.bg.has-hero {
+  background:
+    linear-gradient(115deg, rgba(3, 10, 18, 0.91), rgba(7, 18, 31, 0.72)),
+    var(--hero) center / cover no-repeat,
+    var(--bg);
+}
+.view {
+  position: absolute;
+  inset: 0;
+  display: none;
+  padding: 70px 110px;
+  align-items: center;
+  justify-content: center;
+}
+.view.active {
+  display: flex;
+  animation: fadeIn 0.35s ease-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.center {
+  text-align: center;
+  max-width: 1600px;
+}
+.kicker {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #bbccdb;
+}
+.gold {
+  color: var(--gold);
+}
+
+/* Hero */
+.hero h1 {
+  font-size: 260px;
+  line-height: 0.88;
+  letter-spacing: -0.06em;
+  margin: 30px 0 60px;
+  font-weight: 900;
+}
+.hero h1 span {
+  color: var(--north);
+}
+.hero .question {
+  font-size: 46px;
+  font-weight: 750;
+  line-height: 1.25;
+  max-width: 1500px;
+  margin: 0 auto 38px;
+}
+.versus {
+  font-size: 40px;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+}
+.versus .mot {
+  color: #cfd9e3;
+  font-weight: 700;
+  margin: 0 18px;
+}
+
+/* Hovedspørsmål / påstand */
+.statement .nr {
+  color: var(--gold);
+  font-weight: 950;
+  letter-spacing: 0.18em;
+  font-size: 36px;
+}
+.statement h2 {
+  font-size: 96px;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  margin: 30px auto 40px;
+  max-width: 1650px;
+  font-weight: 900;
+}
+.statement h2.long {
+  font-size: 80px;
+}
+.positions {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  font-size: 30px;
+  font-weight: 800;
+  color: #cfd9e3;
+}
+.positions b {
+  font-weight: 950;
+}
+
+/* QR */
+.qrWrap {
+  display: grid;
+  grid-template-columns: 1fr 640px;
+  gap: 90px;
+  align-items: center;
+  width: 100%;
+}
+.qrText .label {
+  font-size: 30px;
+  color: var(--gold);
+  font-weight: 950;
+  letter-spacing: 0.16em;
+}
+.qrText h2 {
+  font-size: 64px;
+  line-height: 1.1;
+  margin: 24px 0 30px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.qrText h2.long {
+  font-size: 52px;
+}
+.scan {
+  font-size: 52px;
+  font-weight: 950;
+  margin-bottom: 26px;
+}
+.answers {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+.answer {
+  padding: 14px 26px;
+  background: #ffffff14;
+  border: 2px solid #ffffff26;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 32px;
+}
+.count {
+  font-size: 40px;
+  font-weight: 800;
+  color: #d2dce5;
+}
+.count strong {
+  font-size: 78px;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  margin-right: 14px;
+}
+.pollState {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  padding: 8px 18px;
+  border-radius: 10px;
+}
+.pollState.open {
+  background: #17633c;
+  color: #d9ffe8;
+  animation: pulse 1.6s infinite;
+}
+.pollState.closed {
+  background: #3b2330;
+  color: #ffd5dc;
+}
+.qrBox {
+  background: #fff;
+  border-radius: 30px;
+  padding: 26px;
+  width: 640px;
+  height: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 30px 90px #0009;
+}
+.qrBox svg {
+  width: 100%;
+  height: 100%;
+}
+.qrBox.off {
+  background: #1a2633;
+  color: var(--muted);
+  font-size: 34px;
+  text-align: center;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Fordelingsstolper */
+.dist {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+.distRow {
+  display: grid;
+  grid-template-columns: 230px 1fr 140px;
+  gap: 18px;
+  align-items: center;
+  font-size: 30px;
+  font-weight: 900;
+}
+.bar {
+  height: 38px;
+  background: #ffffff12;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.bar > i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 10px;
+  transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.c-against {
+  background: #e05d6f;
+}
+.c-neutral {
+  background: #9aa9b8;
+}
+.c-for {
+  background: #57d68d;
+}
+
+/* Taler (åpningsinnlegg / sluttappell / lagpresentasjon) */
+.speaker {
+  width: 1700px;
+  height: 900px;
+  display: grid;
+  grid-template-columns: 43% 57%;
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 34px;
+  overflow: hidden;
+  box-shadow: 0 30px 90px #0008;
+}
+.speaker.southMode {
+  grid-template-columns: 57% 43%;
+}
+.speaker.southMode .photo {
+  order: 2;
+}
+.speaker.teamNorth {
+  border-color: #55c8ff66;
+}
+.speaker.teamSouth {
+  border-color: #ff654f66;
+}
+.photo {
+  position: relative;
+  background: #0d1621 center / cover no-repeat;
+  overflow: hidden;
+}
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.photo.n::after {
+  background: linear-gradient(0deg, #004b7055, transparent 60%);
+}
+.photo.s::after {
+  background: linear-gradient(0deg, #711f1755, transparent 60%);
+}
+.photo .fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 200px;
+  font-weight: 950;
+  letter-spacing: -0.05em;
+}
+.photo.missing img {
+  display: none;
+}
+.photo.missing .fallback {
+  display: flex;
+}
+.photo.n .fallback {
+  background: linear-gradient(160deg, #0b5b80, #07243a);
+  color: #bfeaff;
+}
+.photo.s .fallback {
+  background: linear-gradient(160deg, #7c251c, #3a0f0a);
+  color: #ffd3cc;
+}
+.speech {
+  padding: 60px 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.team {
+  font-size: 96px;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.phase {
+  font-size: 38px;
+  color: #c7d5e1;
+  margin-top: 14px;
+  font-weight: 700;
+}
+.timer {
+  font-size: 250px;
+  font-weight: 950;
+  line-height: 0.9;
+  letter-spacing: -0.07em;
+  font-variant-numeric: tabular-nums;
+  margin: 34px 0;
+  color: #fff;
+  transition: color 0.3s;
+}
+.timer.warn {
+  color: var(--gold);
+}
+.timer.danger {
+  color: var(--south);
+  animation: pulse 0.55s infinite;
+}
+.timer.done {
+  color: var(--south);
+  letter-spacing: 0;
+}
+.timer.hidden {
+  display: none;
+}
+.smallStatement {
+  font-size: 28px;
+  line-height: 1.35;
+  color: #c6d2dd;
+}
+.stance {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: #ffffff14;
+}
+.cards {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+.card {
+  background: #ffffff10;
+  border: 1px solid #ffffff22;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 800;
+  font-size: 22px;
+}
+.card.used {
+  opacity: 0.25;
+  text-decoration: line-through;
+}
+
+/* Kryssforhør */
+.cross h2,
+.board h2 {
+  font-size: 120px;
+  margin: 10px 0 40px;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+.crossgrid,
+.scoregrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  width: 1500px;
+  margin: 0 auto;
+}
+.teamBox,
+.scoreBox {
+  background: var(--panel);
+  border: 3px solid transparent;
+  border-radius: 28px;
+  padding: 40px;
+  text-align: center;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s,
+    opacity 0.3s;
+}
+.teamBox {
+  opacity: 0.55;
+}
+.teamBox strong,
+.scoreBox strong {
+  font-size: 70px;
+  font-weight: 950;
+}
+.teamBox.activeN {
+  border-color: var(--north);
+  box-shadow: 0 0 60px #55c8ff55;
+  opacity: 1;
+}
+.teamBox.activeS {
+  border-color: var(--south);
+  box-shadow: 0 0 60px #ff654f55;
+  opacity: 1;
+}
+.teamBox .tag {
+  display: block;
+  margin-top: 12px;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  min-height: 32px;
+}
+.cross .timer {
+  font-size: 190px;
+  margin: 40px 0 0;
+}
+.crossStatement {
+  font-size: 30px;
+  color: #c7d5e1;
+  max-width: 1500px;
+  margin: 0 auto;
+  line-height: 1.35;
+}
+
+/* Resultat */
+.result {
+  width: 100%;
+}
+.result .head {
+  text-align: center;
+}
+.result .head h2 {
+  font-size: 60px;
+  margin: 14px auto 0;
+  line-height: 1.12;
+  max-width: 1600px;
+  font-weight: 900;
+}
+.result .head h2.long {
+  font-size: 48px;
+}
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  margin: 50px auto 30px;
+  width: 1600px;
+}
+.compare h3 {
+  font-size: 34px;
+  letter-spacing: 0.16em;
+  margin: 0 0 16px;
+  color: #cbd6e0;
+}
+.compare .total {
+  font-size: 24px;
+  color: var(--muted);
+  font-weight: 700;
+  margin-top: 10px;
+}
+.delta {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  font-size: 32px;
+  font-weight: 900;
+}
+.delta span {
+  padding: 8px 18px;
+  border-radius: 12px;
+  background: #ffffff10;
+}
+.verdict {
+  margin-top: 36px;
+  text-align: center;
+}
+.verdict .big {
+  font-size: 110px;
+  font-weight: 950;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.verdict .sub {
+  font-size: 36px;
+  color: #d2dce5;
+  font-weight: 800;
+  margin-top: 8px;
+}
+.verdict .winner {
+  font-size: 64px;
+  font-weight: 950;
+  margin-top: 22px;
+}
+.badge {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: #725c10;
+  color: #fff4cf;
+  margin-top: 16px;
+}
+.pop {
+  animation: pop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Leaderboard */
+.scoreBox {
+  border-color: #ffffff1a;
+}
+.scoreBox.lead {
+  border-color: var(--gold);
+  box-shadow: 0 0 60px #ffd16633;
+}
+.scoreBox .points {
+  font-size: 220px;
+  font-weight: 950;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.scoreBox .unit {
+  font-size: 28px;
+  color: var(--muted);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.rounds {
+  margin-top: 26px;
+  display: grid;
+  gap: 10px;
+}
+.round {
+  display: flex;
+  justify-content: space-between;
+  font-size: 30px;
+  font-weight: 800;
+  color: #cad6e0;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: #ffffff08;
+}
+.round.win {
+  background: #ffd1661f;
+  color: #fff;
+}
+.round .star {
+  color: var(--gold);
+  margin-left: 8px;
+}
+.round.pending {
+  opacity: 0.45;
+}
+.board .kicker {
+  margin-bottom: 0;
+}
+
+/* Hovedresultat */
+.final .winnerLine {
+  font-size: 72px;
+  font-weight: 950;
+  margin-top: 40px;
+}
+.final .thanks {
+  font-size: 34px;
+  color: var(--gold);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  margin-top: 24px;
+}
+.final .compare {
+  margin-top: 36px;
+  text-align: left;
+}
+.final .distRow {
+  grid-template-columns: 300px 1fr 90px;
+  font-size: 28px;
+}
+
+/* Debattregler */
+.rulesWrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  width: 1700px;
+  align-items: start;
+}
+.rules h2 {
+  font-size: 96px;
+  margin: 10px 0 30px;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+.rulesFormat {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.rulesFormat li {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+.rulesFormat .no {
+  flex: 0 0 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffd16622;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-size: 32px;
+  font-weight: 950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rulesFormat b {
+  display: block;
+  font-size: 36px;
+  font-weight: 950;
+}
+.rulesFormat span {
+  font-size: 27px;
+  color: #d2dce5;
+}
+.rulesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 26px;
+}
+.ruleCard {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  background: var(--panel);
+  border: 1px solid #ffffff22;
+  border-radius: 20px;
+  padding: 16px 24px;
+}
+.ruleCard .icon {
+  font-size: 58px;
+  line-height: 1;
+}
+.ruleCard .t {
+  font-size: 30px;
+  font-weight: 950;
+}
+.ruleCard .d {
+  font-size: 24px;
+  color: #d2dce5;
+  line-height: 1.3;
+}
+
+/* Vinner */
+.winner .winnerName {
+  font-size: 200px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  margin: 20px 0 30px;
+  text-shadow: 0 0 80px currentColor;
+}
+.winnerScore {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 30px;
+  font-size: 60px;
+  font-weight: 900;
+}
+.winnerScore b {
+  font-size: 110px;
+  font-variant-numeric: tabular-nums;
+}
+.winnerScore .dash {
+  color: #7d8b99;
+}
+.winner .unit {
+  font-size: 26px;
+  color: var(--muted);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  margin-top: 6px;
+}
+.winnerRounds {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 40px;
+}
+.winnerRounds div {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  background: #ffffff0d;
+  border-radius: 14px;
+  padding: 12px 22px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #cad6e0;
+}
+.winnerRounds b {
+  font-size: 34px;
+}
+.finalShift {
+  font-size: 54px;
+  font-weight: 950;
+  margin-top: 36px;
+}
+.timer.over {
+  color: var(--south);
+}
+
+/* Video og svart */
+.view.video {
+  padding: 0;
+  background: #000;
+}
+.view.video video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+.view.black {
+  background: #000;
+}
+.videoMissing {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 44px;
+  color: #d2dce5;
+  background: #000;
+}
+.videoMissing.show {
+  display: flex;
+}
+
+/* Overlegg */
+.flash {
+  position: absolute;
+  inset: 0;
+  display: none;
+  z-index: 30;
+  background: #000d;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.flash.show {
+  display: flex;
+}
+.flash > div {
+  background: #132231;
+  border: 3px solid #ffffff33;
+  border-radius: 34px;
+  padding: 60px 90px;
+  max-width: 1200px;
+  animation: pop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.flash.north > div {
+  border-color: var(--north);
+}
+.flash.south > div {
+  border-color: var(--south);
+}
+.flashIcon {
+  font-size: 170px;
+  line-height: 1.1;
+}
+.flashTitle {
+  font-size: 80px;
+  font-weight: 950;
+}
+.flashText {
+  font-size: 38px;
+  color: #d2dce5;
+  margin-top: 14px;
+}
+.status {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  z-index: 40;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 800;
+}
+.status .offline {
+  display: none;
+  background: #3b1111cc;
+  border: 1px solid #ff654f88;
+  color: #ffd5cc;
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+.status .offline.show {
+  display: inline-block;
+}
+.status .demo {
+  display: none;
+  background: #725c10cc;
+  color: #fff4cf;
+  border-radius: 10px;
+  padding: 6px 12px;
+  letter-spacing: 0.12em;
+}
+.status .demo.show {
+  display: inline-block;
+}
+.status .muted {
+  display: none;
+  background: #1a2633cc;
+  color: #d2dce5;
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+.status .muted.show {
+  display: inline-block;
+}
+
+/* Startoverlegg (gir lyd- og fullskjermtillatelse) */
+#start {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07111cf2;
+  text-align: center;
+  padding: 24px;
+}
+#start.hidden {
+  display: none;
+}
+#start h1 {
+  font-size: 44px;
+  margin: 0 0 12px;
+}
+#start p {
+  color: var(--muted);
+  font-size: 18px;
+  max-width: 640px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+#start button {
+  font: inherit;
+  font-size: 24px;
+  font-weight: 900;
+  padding: 18px 36px;
+  border-radius: 14px;
+  border: 2px solid var(--north);
+  background: var(--north-deep);
+  color: #fff;
+  cursor: pointer;
+}
+#start .warn {
+  color: var(--gold);
+  font-weight: 800;
+}
+
+    </style>
+    <script src="../config.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>window.ISQ_BOOT = Object.assign({}, window.ISQ_CONFIG || {}, { page: "display", poll: (function () { try { var p = new URLSearchParams(location.search).get('poll'); return p && /^[a-z0-9-]{1,20}$/.test(p) ? p : null; } catch (e) { return null; } })() });</script>
+  </head>
+  <body>
+    <div id="start" role="dialog" aria-modal="true" aria-labelledby="startTitle">
+      <div>
+        <h1 id="startTitle">Publikumsskjerm</h1>
+        <p>
+          Klikk for å starte. Da slås lyd på og skjermen går i fullskjerm. Trykk <b>F</b> for fullskjerm senere,
+          <b>Esc</b> for å gå ut.
+        </p>
+        <p id="startWarn" class="warn" hidden></p>
+        <button id="startBtn" type="button">Start publikumsskjerm</button>
+      </div>
+    </div>
+
+    <div id="stage" aria-live="off">
+      <div id="bg" class="bg"></div>
+
+      <section id="v-hero" class="view hero" aria-label="Forside">
+        <div class="center">
+          <div class="kicker" id="heroKicker">Statsbygg presenterer</div>
+          <h1 id="heroTitle">I-<span>Squared</span></h1>
+          <div class="versus">
+            <span class="north" id="heroNorth">LAG NORD</span><span class="mot">mot</span
+            ><span class="south" id="heroSouth">LAG SØR</span><span class="mot">•</span
+            ><span>Publikum avgjør</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-mainQuestion" class="view statement" aria-label="Hovedspørsmål">
+        <div class="center">
+          <div class="nr">HOVEDSPØRSMÅL</div>
+          <h2 id="mqText"></h2>
+        </div>
+      </section>
+
+      <section id="v-statement" class="view statement" aria-label="Påstand">
+        <div class="center">
+          <div class="nr" id="stNr"></div>
+          <h2 id="stText"></h2>
+          <div class="positions" id="stPositions"></div>
+        </div>
+      </section>
+
+      <section id="v-qr" class="view" aria-label="Avstemning">
+        <div class="qrWrap">
+          <div class="qrText">
+            <div class="label" id="qrLabel"></div>
+            <h2 id="qrTitle"></h2>
+            <div class="scan">Skann for å stemme</div>
+            <div class="answers" id="qrAnswers"></div>
+            <div class="count" aria-live="polite"><strong id="qrCount">0</strong>stemmer mottatt</div>
+            <div id="qrState" class="pollState"></div>
+            <div class="dist" id="qrDist"></div>
+          </div>
+          <div class="qrBox" id="qrBox" aria-label="QR-kode til stemmesiden"></div>
+        </div>
+      </section>
+
+      <section id="v-speaker" class="view" aria-label="Taler">
+        <div id="speakerCard" class="speaker">
+          <div id="spPhoto" class="photo n"><img id="spImg" alt="" /><div class="fallback" id="spFallback">N</div></div>
+          <div class="speech">
+            <div id="spTeam" class="team north"></div>
+            <div id="spPhase" class="phase"></div>
+            <div id="spTimer" class="timer">03:00</div>
+            <div id="spStatement" class="smallStatement"></div>
+            <div><span id="spStance" class="stance"></span></div>
+            <div id="spCards" class="cards"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-cross" class="view cross" aria-label="Kryssforhør">
+        <div class="center">
+          <div class="kicker" id="crossLabel"></div>
+          <h2>KRYSSFORHØR</h2>
+          <div class="crossgrid">
+            <div id="crossN" class="teamBox"><strong class="north" id="crossNName">LAG NORD</strong><span class="tag" id="crossNTag"></span></div>
+            <div id="crossS" class="teamBox"><strong class="south" id="crossSName">LAG SØR</strong><span class="tag" id="crossSTag"></span></div>
+          </div>
+          <div id="crossTimer" class="timer">01:00</div>
+          <div class="crossStatement" id="crossStatement"></div>
+        </div>
+      </section>
+
+      <section id="v-result" class="view" aria-label="Avstemningsresultat">
+        <div class="result">
+          <div class="head">
+            <div class="kicker gold" id="resLabel"></div>
+            <h2 id="resText"></h2>
+          </div>
+          <div id="resBody"></div>
+        </div>
+      </section>
+
+      <section id="v-leaderboard" class="view board" aria-label="Leaderboard">
+        <div class="center">
+          <div class="kicker">Flyttede stemmer</div>
+          <h2>LEADERBOARD</h2>
+          <div class="scoregrid">
+            <div class="scoreBox" id="lbN">
+              <strong class="north" id="lbNName">LAG NORD</strong>
+              <div class="points north" id="lbNScore">0</div>
+              <div class="unit">FLYTTEDE STEMMER</div>
+              <div class="rounds" id="lbNRounds"></div>
+            </div>
+            <div class="scoreBox" id="lbS">
+              <strong class="south" id="lbSName">LAG SØR</strong>
+              <div class="points south" id="lbSScore">0</div>
+              <div class="unit">FLYTTEDE STEMMER</div>
+              <div class="rounds" id="lbSRounds"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-mainResult" class="view final" aria-label="Hovedresultat">
+        <div class="center" style="width: 100%">
+          <div class="kicker gold">HOVEDSPØRSMÅLET – FØR OG ETTER</div>
+          <div id="finalBody"></div>
+        </div>
+      </section>
+
+      <section id="v-rules" class="view rules" aria-label="Debattregler">
+        <div class="rulesWrap">
+          <div>
+            <div class="kicker gold">SLIK FUNGERER DEBATTEN</div>
+            <h2>DEBATTREGLER</h2>
+            <ol class="rulesFormat" id="rulesFormat"></ol>
+          </div>
+          <div>
+            <div class="kicker gold">SPILLEKORT – ÉN GANG PER LAG</div>
+            <div class="rulesGrid" id="rulesGrid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-winner" class="view winner" aria-label="Vinner av debatten">
+        <div class="center" id="winnerBody"></div>
+      </section>
+
+      <section id="v-video" class="view video" aria-label="Video">
+        <video id="player" playsinline muted preload="auto"></video>
+        <div id="videoMissing" class="videoMissing"></div>
+      </section>
+
+      <section id="v-black" class="view black" aria-label="Svart skjerm"></section>
+
+      <div id="flash" class="flash" role="alert">
+        <div>
+          <div id="flashIcon" class="flashIcon"></div>
+          <div id="flashTitle" class="flashTitle"></div>
+          <div id="flashText" class="flashText"></div>
+        </div>
+      </div>
+
+      <div class="status">
+        <span id="muted" class="muted" title="Nettleseren blokkerte lyd">🔇 Klikk for lyd</span>
+        <span id="demo" class="demo">DEMO</span>
+        <span id="offline" class="offline" role="status">⚠︎ Frakoblet – prøver igjen</span>
+      </div>
+    </div>
+    <audio id="music" loop preload="auto"></audio>
+    <audio id="soundtrack" preload="auto"></audio>
+
+    <script>
+      // @ts-check
+/**
+ * Seed-data og faste definisjoner for I-Squared Statsbygg.
+ * Kjører i Apps Script (global), i nettleseren (global) og i Node (module.exports).
+ */
+var ISQ_Config = (function () {
+  'use strict';
+
+  var CHOICES = ['against', 'neutral', 'for'];
+  var CHOICE_LABELS = { against: 'MOT', neutral: 'NØYTRAL', for: 'FOR' };
+  /** Skala for netto flyttede stemmesteg. */
+  var CHOICE_VALUE = { against: 0, neutral: 1, for: 2 };
+
+  var TEAMS = ['north', 'south'];
+
+  var CARDS = [
+    { key: 'yellow', icon: '🟨', title: 'PASS', name: 'Gult kort', text: 'Laget slipper å svare.' },
+    { key: 'red', icon: '🟥', title: 'INNSIGELSE', name: 'Rødt kort', text: 'Laget avbryter med en kort innsigelse.' },
+    { key: 'green', icon: '🟩', title: 'EKSTRATID', name: 'Grønt kort', text: 'Laget får ett ekstra minutt.' },
+    { key: 'english', icon: '🇬🇧', title: 'ENGLISH, PLEASE', name: 'Britisk flagg', text: 'Svaret må gis på engelsk.' },
+    { key: 'yesno', icon: '❗', title: 'JA ELLER NEI', name: 'Utropstegn', text: 'Motstanderlaget må først svare ja eller nei.' }
+  ];
+
+  var VIEWS = [
+    'hero',
+    'mainQuestion',
+    'statement',
+    'qr',
+    'team',
+    'opening',
+    'cross',
+    'closing',
+    'result',
+    'leaderboard',
+    'mainResult',
+    'winner',
+    'rules',
+    'video',
+    'black'
+  ];
+
+  var VIEW_LABELS = {
+    hero: 'Hero',
+    mainQuestion: 'Hovedspørsmål',
+    statement: 'Påstand',
+    qr: 'QR-kode / avstemning',
+    team: 'Lagpresentasjon',
+    opening: 'Åpningsinnlegg',
+    cross: 'Kryssforhør',
+    closing: 'Sluttappell',
+    result: 'Avstemningsresultat',
+    leaderboard: 'Leaderboard',
+    mainResult: 'Resultat hovedspørsmål',
+    winner: 'Vinner av debatten',
+    rules: 'Debattregler',
+    video: 'Video',
+    black: 'Svart skjerm'
+  };
+
+  /**
+   * Videoer spilles fra den lokale publikumsskjerm-mappen på Mac-en.
+   * returnTo: hvor skjermen går når videoen er ferdig (null = visningen før videoen).
+   */
+  var VIDEOS = [
+    { key: 'introNorth', label: 'Introvideo Lag Nord', file: 'media/video/Introvideonord.mp4', team: 'north', returnTo: null },
+    { key: 'introSouth', label: 'Introvideo Lag Sør', file: 'media/video/Introvideosør.mp4', team: 'south', returnTo: { view: 'statement', statementNo: 1 } },
+    {
+      key: 'extra1',
+      label: 'Ekstravideo påstand 1',
+      file: 'media/video/ekstravideopåstand1.mp4',
+      statement: 1,
+      returnTo: { view: 'statement', statementNo: 1 }
+    },
+    {
+      key: 'extra2',
+      label: 'Ekstravideo påstand 2',
+      file: 'media/video/ekstravideopåstand2.mp4',
+      statement: 2,
+      returnTo: { view: 'statement', statementNo: 2 }
+    },
+    {
+      key: 'extra3',
+      label: 'Ekstravideo påstand 3',
+      file: 'media/video/ekstravideopåstand3.mp4',
+      statement: 3,
+      returnTo: { view: 'statement', statementNo: 3 }
+    }
+  ];
+
+  /** Debattdeler: varighet styres i innstillingene; overtime = timeren fortsetter i minus. */
+  var SEGMENTS = {
+    opening: { label: 'Åpningsinnlegg', overtime: true, autoReturn: false },
+    cross: { label: 'Kryssforhør', overtime: true, autoReturn: false },
+    closing: { label: 'Sluttappell', overtime: false, autoReturn: true }
+  };
+  /** Sekunder «TID» vises før sluttappellen går automatisk tilbake til påstanden. */
+  var AUTO_RETURN_GRACE_MS = 2000;
+
+  var MUSIC = [
+    { key: 'walkon', label: 'Innmarsj', file: 'media/music/innmarsj.mp3' },
+    { key: 'break', label: 'Pausemusikk', file: 'media/music/pause.mp3' }
+  ];
+
+  var POLL_IDS = ['main-before', 'main-after', 's1-before', 's1-after', 's2-before', 's2-after', 's3-before', 's3-after'];
+
+  var STATUSES = [
+    'setup',
+    'intro',
+    'main_poll_before',
+    'team_introduction',
+    'statement_1_before_poll',
+    'statement_1_debate',
+    'statement_1_after_poll',
+    'statement_1_result',
+    'statement_2_before_poll',
+    'statement_2_debate',
+    'statement_2_after_poll',
+    'statement_2_result',
+    'statement_3_before_poll',
+    'statement_3_debate',
+    'statement_3_after_poll',
+    'statement_3_result',
+    'main_poll_after',
+    'final_result',
+    'completed'
+  ];
+
+  var DEFAULT_SLUG = 'i-squared-statsbygg';
+
+  /** @returns {any} et nytt arrangementsdokument med seed-data */
+  function seedDocument() {
+    var polls = {};
+    POLL_IDS.forEach(function (id) {
+      var parts = id.split('-');
+      var isMain = parts[0] === 'main';
+      polls[id] = {
+        id: id,
+        type: isMain ? 'main' : 'statement',
+        statementNo: isMain ? null : Number(parts[0].slice(1)),
+        phase: parts[1],
+        status: 'draft',
+        openedAt: null,
+        closedAt: null
+      };
+    });
+    return {
+      schemaVersion: 4,
+      version: 1,
+      event: {
+        slug: DEFAULT_SLUG,
+        title: 'I-Squared Statsbygg',
+        heroTitle: 'I-Squared',
+        kicker: 'Statsbygg presenterer',
+        mainQuestion:
+          'Vil den nye styrings- og leveransemodellen modernisere vår digitale utvikling, eller blir den en PowerPoint-presentasjon uten reell praktisk effekt?',
+        mainLabels: { against: 'POWERPOINT', neutral: 'USIKKER', for: 'MODERNISERING' },
+        status: 'setup',
+        demoMode: false,
+        settings: {
+          soundEnabled: true,
+          autoStartTimer: true,
+          requireEqualTurnout: false,
+          durations: { opening: 180, cross: 240, closing: 60, team: 60 }
+        },
+        createdAt: null,
+        updatedAt: null
+      },
+      teams: {
+        north: { key: 'north', name: 'Lag Nord', color: '#55c8ff', image: 'media/images/lagnord.jpg' },
+        south: { key: 'south', name: 'Lag Sør', color: '#ff654f', image: 'media/images/lagsør.jpg' }
+      },
+      statements: [
+        {
+          no: 1,
+          short: 'Tjenester',
+          text: 'Statsbygg bør organisere digital utvikling rundt tjenester, ikke rundt organisasjonsstrukturen.',
+          northPosition: 'against',
+          southPosition: 'for'
+        },
+        {
+          no: 2,
+          short: 'Kontroll',
+          text: 'Den største hindringen for digital utvikling i Statsbygg er ikke teknologi, men ledere som ikke tør å gi fra seg kontroll.',
+          northPosition: 'against',
+          southPosition: 'for'
+        },
+        {
+          no: 3,
+          short: 'Kulturendring',
+          text: 'Den nye styrings- og leveransemodellen krever en kulturendring som Statsbygg ikke er klar for.',
+          northPosition: 'against',
+          southPosition: 'for'
+        }
+      ],
+      polls: polls,
+      state: {
+        view: 'hero',
+        previousView: 'hero',
+        activeStatement: 1,
+        activePollId: null,
+        cueIndex: -1,
+        qrPollId: null,
+        activeTeam: 'north',
+        segment: null,
+        revealDistribution: false,
+        resultStatement: null,
+        video: null,
+        music: null,
+        flash: null
+      },
+      timer: { status: 'idle', startedAt: null, durationSeconds: 180, pausedRemaining: null },
+      cards: [],
+      results: {}
+    };
+  }
+
+  return {
+    CHOICES: CHOICES,
+    CHOICE_LABELS: CHOICE_LABELS,
+    CHOICE_VALUE: CHOICE_VALUE,
+    TEAMS: TEAMS,
+    CARDS: CARDS,
+    VIEWS: VIEWS,
+    VIEW_LABELS: VIEW_LABELS,
+    VIDEOS: VIDEOS,
+    SEGMENTS: SEGMENTS,
+    AUTO_RETURN_GRACE_MS: AUTO_RETURN_GRACE_MS,
+    MUSIC: MUSIC,
+    POLL_IDS: POLL_IDS,
+    STATUSES: STATUSES,
+    DEFAULT_SLUG: DEFAULT_SLUG,
+    seedDocument: seedDocument
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = ISQ_Config;
+
+      // @ts-check
+/**
+ * Serverstyrt timer. Serveren lagrer kun startedAt, durationSeconds, status og
+ * pausedRemaining. Klientene regner ut gjenværende tid lokalt.
+ */
+var ISQ_Timer = (function () {
+  'use strict';
+
+  /** @typedef {{status:string, startedAt:number|null, durationSeconds:number, pausedRemaining:number|null}} TimerState */
+
+  /** @param {number} s */
+  function clampSeconds(s) {
+    var x = Number(s);
+    if (!isFinite(x) || x < 0) return 0;
+    return Math.min(x, 24 * 3600);
+  }
+
+  /** @param {TimerState} t @param {number} now @returns {number} millisekunder igjen */
+  function remainingMs(t, now) {
+    if (!t) return 0;
+    if (t.status === 'running' && t.startedAt != null) {
+      return Math.max(0, t.startedAt + t.durationSeconds * 1000 - now);
+    }
+    if (t.status === 'paused' && t.pausedRemaining != null) {
+      return Math.max(0, t.pausedRemaining * 1000);
+    }
+    return Math.max(0, (t.durationSeconds || 0) * 1000);
+  }
+
+  /**
+   * Som remainingMs, men kan bli negativ når tiden er ute (for debattdeler som går i minus).
+   * @param {TimerState} t @param {number} now
+   */
+  function signedRemainingMs(t, now) {
+    if (t && t.status === 'running' && t.startedAt != null) return t.startedAt + t.durationSeconds * 1000 - now;
+    return remainingMs(t, now);
+  }
+
+  /** Formaterer med minus foran når tiden er passert, f.eks. «−00:12». @param {number} seconds */
+  function formatSigned(seconds) {
+    if (seconds > -1) return format(Math.max(0, seconds));
+    return '−' + format(Math.floor(-seconds));
+  }
+
+  /** @param {number} seconds @returns {TimerState} */
+  function load(seconds) {
+    return { status: 'idle', startedAt: null, durationSeconds: clampSeconds(seconds), pausedRemaining: null };
+  }
+
+  /** @param {TimerState} t @param {number} now @param {number} [seconds] @returns {TimerState} */
+  function start(t, now, seconds) {
+    var d = seconds != null ? clampSeconds(seconds) : t.durationSeconds;
+    return { status: 'running', startedAt: now, durationSeconds: d, pausedRemaining: null };
+  }
+
+  /** @param {TimerState} t @param {number} now @returns {TimerState} */
+  function pause(t, now) {
+    if (t.status !== 'running') return t;
+    return {
+      status: 'paused',
+      startedAt: null,
+      durationSeconds: t.durationSeconds,
+      pausedRemaining: Math.round(remainingMs(t, now)) / 1000
+    };
+  }
+
+  /** @param {TimerState} t @param {number} now @returns {TimerState} */
+  function resume(t, now) {
+    if (t.status === 'paused') {
+      var rem = t.pausedRemaining || 0;
+      return {
+        status: 'running',
+        startedAt: now - (t.durationSeconds - rem) * 1000,
+        durationSeconds: t.durationSeconds,
+        pausedRemaining: null
+      };
+    }
+    if (t.status === 'idle') return start(t, now);
+    return t;
+  }
+
+  /** @param {TimerState} t @returns {TimerState} */
+  function reset(t) {
+    return load(t.durationSeconds);
+  }
+
+  /** @param {TimerState} t @param {number} deltaSeconds @param {number} now @returns {TimerState} */
+  function adjust(t, deltaSeconds, now) {
+    var d = Number(deltaSeconds) || 0;
+    if (t.status === 'running') {
+      var rem = remainingMs(t, now) / 1000;
+      var nextRem = Math.max(0, rem + d);
+      return {
+        status: 'running',
+        startedAt: t.startedAt,
+        durationSeconds: Math.max(0, t.durationSeconds + (nextRem - rem)),
+        pausedRemaining: null
+      };
+    }
+    if (t.status === 'paused') {
+      return {
+        status: 'paused',
+        startedAt: null,
+        durationSeconds: Math.max(0, t.durationSeconds + d),
+        pausedRemaining: Math.max(0, (t.pausedRemaining || 0) + d)
+      };
+    }
+    return load(Math.max(0, t.durationSeconds + d));
+  }
+
+  /** @param {number} seconds @returns {string} */
+  function format(seconds) {
+    var s = Math.max(0, Math.ceil(seconds - 1e-6));
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r;
+  }
+
+  /** Fargefase for publikumsskjermen. @param {number} seconds */
+  function phase(seconds) {
+    if (seconds <= 0) return 'done';
+    if (seconds <= 10) return 'danger';
+    if (seconds <= 30) return 'warn';
+    return 'normal';
+  }
+
+  return {
+    remainingMs: remainingMs,
+    signedRemainingMs: signedRemainingMs,
+    formatSigned: formatSigned,
+    load: load,
+    start: start,
+    pause: pause,
+    resume: resume,
+    reset: reset,
+    adjust: adjust,
+    format: format,
+    phase: phase
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = ISQ_Timer;
+
+      // @ts-check
+/**
+ * Selvstendig QR-kodegenerator (byte-modus, feilretting M, versjon 1–20).
+ * Genererer QR-koder direkte i nettleseren uten eksterne biblioteker.
+ */
+var ISQ_QR = (function () {
+  'use strict';
+
+  // [ecPerBlock, blocks1, data1, blocks2, data2] for feilrettingsnivå M
+  var EC_M = [
+    null,
+    [10, 1, 16, 0, 0],
+    [16, 1, 28, 0, 0],
+    [26, 1, 44, 0, 0],
+    [18, 2, 32, 0, 0],
+    [24, 2, 43, 0, 0],
+    [16, 4, 27, 0, 0],
+    [18, 4, 31, 0, 0],
+    [22, 2, 38, 2, 39],
+    [22, 3, 36, 2, 37],
+    [26, 4, 43, 1, 44],
+    [30, 1, 50, 4, 51],
+    [22, 6, 36, 2, 37],
+    [22, 8, 37, 1, 38],
+    [24, 4, 40, 5, 41],
+    [24, 5, 41, 5, 42],
+    [28, 7, 45, 3, 46],
+    [28, 10, 46, 1, 47],
+    [26, 9, 43, 4, 44],
+    [26, 3, 44, 11, 45],
+    [26, 3, 41, 13, 42]
+  ];
+
+  var ALIGN = [
+    null,
+    [],
+    [6, 18],
+    [6, 22],
+    [6, 26],
+    [6, 30],
+    [6, 34],
+    [6, 22, 38],
+    [6, 24, 42],
+    [6, 26, 46],
+    [6, 28, 50],
+    [6, 30, 54],
+    [6, 32, 58],
+    [6, 34, 62],
+    [6, 26, 46, 66],
+    [6, 26, 48, 70],
+    [6, 26, 50, 74],
+    [6, 30, 54, 78],
+    [6, 30, 56, 82],
+    [6, 30, 58, 86],
+    [6, 34, 62, 90]
+  ];
+
+  var EC_FORMAT_BITS_M = 0; // M = 00
+
+  // ---------- GF(256) ----------
+  var EXP = new Array(512);
+  var LOG = new Array(256);
+  (function initGf() {
+    var x = 1;
+    for (var i = 0; i < 255; i++) {
+      EXP[i] = x;
+      LOG[x] = i;
+      x <<= 1;
+      if (x & 0x100) x ^= 0x11d;
+    }
+    for (var j = 255; j < 512; j++) EXP[j] = EXP[j - 255];
+  })();
+
+  /** @param {number} a @param {number} b */
+  function gfMul(a, b) {
+    if (a === 0 || b === 0) return 0;
+    return EXP[LOG[a] + LOG[b]];
+  }
+
+  /** @param {number} degree @returns {number[]} */
+  function generator(degree) {
+    var g = [1];
+    for (var i = 0; i < degree; i++) {
+      var next = new Array(g.length + 1).fill(0);
+      for (var j = 0; j < g.length; j++) {
+        next[j] ^= g[j];
+        next[j + 1] ^= gfMul(g[j], EXP[i]);
+      }
+      g = next;
+    }
+    return g;
+  }
+
+  /** @param {number[]} data @param {number} ecLen @returns {number[]} */
+  function rsRemainder(data, ecLen) {
+    var gen = generator(ecLen);
+    var res = new Array(ecLen).fill(0);
+    for (var i = 0; i < data.length; i++) {
+      var factor = data[i] ^ res[0];
+      res.shift();
+      res.push(0);
+      for (var j = 0; j < ecLen; j++) res[j] ^= gfMul(gen[j + 1], factor);
+    }
+    return res;
+  }
+
+  // ---------- Hjelpere ----------
+  /** @param {string} str @returns {number[]} */
+  function utf8Bytes(str) {
+    var out = [];
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charCodeAt(i);
+      if (c >= 0xd800 && c <= 0xdbff && i + 1 < str.length) {
+        var c2 = str.charCodeAt(i + 1);
+        if (c2 >= 0xdc00 && c2 <= 0xdfff) {
+          c = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
+          i++;
+        }
+      }
+      if (c < 0x80) out.push(c);
+      else if (c < 0x800) out.push(0xc0 | (c >> 6), 0x80 | (c & 63));
+      else if (c < 0x10000) out.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      else out.push(0xf0 | (c >> 18), 0x80 | ((c >> 12) & 63), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+    }
+    return out;
+  }
+
+  /** @param {number} v */
+  function dataCapacity(v) {
+    var e = EC_M[v];
+    return e[1] * e[2] + e[3] * e[4];
+  }
+
+  /** @param {number} x @param {number} i */
+  function bit(x, i) {
+    return ((x >>> i) & 1) !== 0;
+  }
+
+  // ---------- Koding ----------
+  /**
+   * @param {string} text
+   * @returns {{size:number, version:number, modules:boolean[][]}}
+   */
+  function encode(text) {
+    var bytes = utf8Bytes(String(text));
+    var version = 0;
+    for (var v = 1; v <= 20; v++) {
+      var ccBits = v < 10 ? 8 : 16;
+      var needBits = 4 + ccBits + bytes.length * 8;
+      if (needBits <= dataCapacity(v) * 8) {
+        version = v;
+        break;
+      }
+    }
+    if (!version) throw new Error('Teksten er for lang for QR-kode');
+
+    var capBits = dataCapacity(version) * 8;
+    /** @type {number[]} */
+    var bits = [];
+    /** @param {number} val @param {number} len */
+    function push(val, len) {
+      for (var i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1);
+    }
+    push(4, 4);
+    push(bytes.length, version < 10 ? 8 : 16);
+    bytes.forEach(function (b) {
+      push(b, 8);
+    });
+    push(0, Math.min(4, capBits - bits.length));
+    while (bits.length % 8) bits.push(0);
+    var codewords = [];
+    for (var k = 0; k < bits.length; k += 8) {
+      var byte = 0;
+      for (var m = 0; m < 8; m++) byte = (byte << 1) | bits[k + m];
+      codewords.push(byte);
+    }
+    for (var pad = 0xec; codewords.length < capBits / 8; pad ^= 0xec ^ 0x11) codewords.push(pad);
+
+    // Blokker + feilretting
+    var e = EC_M[version];
+    var blocks = [];
+    var ecBlocks = [];
+    var pos = 0;
+    for (var g = 0; g < 2; g++) {
+      var count = g === 0 ? e[1] : e[3];
+      var len = g === 0 ? e[2] : e[4];
+      for (var b2 = 0; b2 < count; b2++) {
+        var blk = codewords.slice(pos, pos + len);
+        pos += len;
+        blocks.push(blk);
+        ecBlocks.push(rsRemainder(blk, e[0]));
+      }
+    }
+    var finalCw = [];
+    var maxData = Math.max(e[2], e[4]);
+    for (var i2 = 0; i2 < maxData; i2++) {
+      for (var j2 = 0; j2 < blocks.length; j2++) if (i2 < blocks[j2].length) finalCw.push(blocks[j2][i2]);
+    }
+    for (var i3 = 0; i3 < e[0]; i3++) {
+      for (var j3 = 0; j3 < ecBlocks.length; j3++) finalCw.push(ecBlocks[j3][i3]);
+    }
+
+    // Matrise
+    var size = version * 4 + 17;
+    /** @type {boolean[][]} */
+    var mod = [];
+    /** @type {boolean[][]} */
+    var fn = [];
+    for (var r = 0; r < size; r++) {
+      mod.push(new Array(size).fill(false));
+      fn.push(new Array(size).fill(false));
+    }
+    /** @param {number} x @param {number} y @param {boolean} dark */
+    function setFn(x, y, dark) {
+      mod[y][x] = dark;
+      fn[y][x] = true;
+    }
+    for (var t = 0; t < size; t++) {
+      setFn(6, t, t % 2 === 0);
+      setFn(t, 6, t % 2 === 0);
+    }
+    /** @param {number} cx @param {number} cy */
+    function finder(cx, cy) {
+      for (var dy = -4; dy <= 4; dy++) {
+        for (var dx = -4; dx <= 4; dx++) {
+          var d = Math.max(Math.abs(dx), Math.abs(dy));
+          var xx = cx + dx;
+          var yy = cy + dy;
+          if (xx >= 0 && xx < size && yy >= 0 && yy < size) setFn(xx, yy, d !== 2 && d !== 4);
+        }
+      }
+    }
+    finder(3, 3);
+    finder(size - 4, 3);
+    finder(3, size - 4);
+    var al = ALIGN[version];
+    var last = al.length - 1;
+    for (var ai = 0; ai < al.length; ai++) {
+      for (var aj = 0; aj < al.length; aj++) {
+        if ((ai === 0 && aj === 0) || (ai === 0 && aj === last) || (ai === last && aj === 0)) continue;
+        for (var ady = -2; ady <= 2; ady++) {
+          for (var adx = -2; adx <= 2; adx++) {
+            setFn(al[ai] + adx, al[aj] + ady, Math.max(Math.abs(adx), Math.abs(ady)) !== 1);
+          }
+        }
+      }
+    }
+    /** @param {number} mask */
+    function drawFormat(mask) {
+      var data = (EC_FORMAT_BITS_M << 3) | mask;
+      var rem = data;
+      for (var q = 0; q < 10; q++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+      var fbits = ((data << 10) | rem) ^ 0x5412;
+      for (var a = 0; a <= 5; a++) setFn(8, a, bit(fbits, a));
+      setFn(8, 7, bit(fbits, 6));
+      setFn(8, 8, bit(fbits, 7));
+      setFn(7, 8, bit(fbits, 8));
+      for (var b = 9; b < 15; b++) setFn(14 - b, 8, bit(fbits, b));
+      for (var c = 0; c < 8; c++) setFn(size - 1 - c, 8, bit(fbits, c));
+      for (var d2 = 8; d2 < 15; d2++) setFn(8, size - 15 + d2, bit(fbits, d2));
+      setFn(8, size - 8, true);
+    }
+    drawFormat(0);
+    if (version >= 7) {
+      var vrem = version;
+      for (var vq = 0; vq < 12; vq++) vrem = (vrem << 1) ^ ((vrem >>> 11) * 0x1f25);
+      var vbits = (version << 12) | vrem;
+      for (var vi = 0; vi < 18; vi++) {
+        var vb = bit(vbits, vi);
+        var va = size - 11 + (vi % 3);
+        var vc = Math.floor(vi / 3);
+        setFn(va, vc, vb);
+        setFn(vc, va, vb);
+      }
+    }
+    // Data
+    var idx = 0;
+    for (var right = size - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (var vert = 0; vert < size; vert++) {
+        for (var jj = 0; jj < 2; jj++) {
+          var x = right - jj;
+          var upward = ((right + 1) & 2) === 0;
+          var y = upward ? size - 1 - vert : vert;
+          if (!fn[y][x] && idx < finalCw.length * 8) {
+            mod[y][x] = bit(finalCw[idx >>> 3], 7 - (idx & 7));
+            idx++;
+          }
+        }
+      }
+    }
+
+    /** @param {number} mask @param {number} x @param {number} y */
+    function maskBit(mask, x, y) {
+      switch (mask) {
+        case 0:
+          return (x + y) % 2 === 0;
+        case 1:
+          return y % 2 === 0;
+        case 2:
+          return x % 3 === 0;
+        case 3:
+          return (x + y) % 3 === 0;
+        case 4:
+          return (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0;
+        case 5:
+          return ((x * y) % 2) + ((x * y) % 3) === 0;
+        case 6:
+          return (((x * y) % 2) + ((x * y) % 3)) % 2 === 0;
+        default:
+          return (((x + y) % 2) + ((x * y) % 3)) % 2 === 0;
+      }
+    }
+    /** @param {number} mask */
+    function applyMask(mask) {
+      for (var yy = 0; yy < size; yy++) {
+        for (var xx = 0; xx < size; xx++) {
+          if (!fn[yy][xx] && maskBit(mask, xx, yy)) mod[yy][xx] = !mod[yy][xx];
+        }
+      }
+    }
+    function penalty() {
+      var p = 0;
+      var line, run, prev;
+      for (var dir = 0; dir < 2; dir++) {
+        for (var a = 0; a < size; a++) {
+          run = 0;
+          prev = null;
+          line = [];
+          for (var b = 0; b < size; b++) {
+            var cell = dir === 0 ? mod[a][b] : mod[b][a];
+            line.push(cell ? 1 : 0);
+            if (cell === prev) {
+              run++;
+              if (run === 5) p += 3;
+              else if (run > 5) p++;
+            } else {
+              run = 1;
+              prev = cell;
+            }
+          }
+          var s = line.join('');
+          var re = /(?=(10111010000|00001011101))/g;
+          var found = s.match(re);
+          if (found) p += 40 * found.length;
+        }
+      }
+      for (var yy = 0; yy < size - 1; yy++) {
+        for (var xx = 0; xx < size - 1; xx++) {
+          var c = mod[yy][xx];
+          if (c === mod[yy][xx + 1] && c === mod[yy + 1][xx] && c === mod[yy + 1][xx + 1]) p += 3;
+        }
+      }
+      var dark = 0;
+      for (var y2 = 0; y2 < size; y2++) for (var x2 = 0; x2 < size; x2++) if (mod[y2][x2]) dark++;
+      var k = Math.ceil(Math.abs(dark * 20 - size * size * 10) / (size * size)) - 1;
+      p += Math.max(0, k) * 10;
+      return p;
+    }
+    var bestMask = 0;
+    var best = Infinity;
+    for (var mk = 0; mk < 8; mk++) {
+      applyMask(mk);
+      drawFormat(mk);
+      var pen = penalty();
+      if (pen < best) {
+        best = pen;
+        bestMask = mk;
+      }
+      applyMask(mk);
+    }
+    applyMask(bestMask);
+    drawFormat(bestMask);
+    return { size: size, version: version, modules: mod };
+  }
+
+  /**
+   * SVG-streng for teksten.
+   * @param {string} text
+   * @param {{margin?:number, dark?:string, light?:string, title?:string}} [opts]
+   */
+  function toSvg(text, opts) {
+    var o = opts || {};
+    var margin = o.margin == null ? 4 : o.margin;
+    var qr = encode(text);
+    var n = qr.size + margin * 2;
+    var d = '';
+    for (var y = 0; y < qr.size; y++) {
+      for (var x = 0; x < qr.size; x++) {
+        if (qr.modules[y][x]) d += 'M' + (x + margin) + ' ' + (y + margin) + 'h1v1h-1z';
+      }
+    }
+    var title = o.title ? '<title>' + escapeXml(o.title) + '</title>' : '';
+    return (
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' +
+      n +
+      ' ' +
+      n +
+      '" shape-rendering="crispEdges" role="img">' +
+      title +
+      '<rect width="100%" height="100%" fill="' +
+      (o.light || '#fff') +
+      '"/>' +
+      '<path d="' +
+      d +
+      '" fill="' +
+      (o.dark || '#000') +
+      '"/></svg>'
+    );
+  }
+
+  /** @param {string} s */
+  function escapeXml(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] || c;
+    });
+  }
+
+  return { encode: encode, toSvg: toSvg };
+})();
+
+if (typeof module !== 'undefined' && module.exports) module.exports = ISQ_QR;
+
+      // @ts-check
+/**
+ * Felles klientkode: transport til Supabase, sanntidsvarsler, klokkesynkronisering,
+ * polling, trygg lokal lagring og små DOM-hjelpere.
+ *
+ * Transport (BOOT.supabaseUrl + BOOT.supabaseKey fra config.js):
+ *  - public.voteState  → leser stemmekatalogen (tabellen isq_live) direkte
+ *  - public.vote       → databasefunksjonen isq_cast_vote (rask, tåler mange samtidige)
+ *  - alt annet         → Edge Function «isq» (motoren)
+ *  - sanntid           → Supabase Realtime på isq_live / isq_tick, med polling som reserve
+ */
+var ISQ_Client = (function () {
+  'use strict';
+
+  var w = /** @type {any} */ (window);
+  var BOOT = w.ISQ_BOOT || {};
+  var SB_URL = String(BOOT.supabaseUrl || '').replace(/\/+$/, '');
+  var SB_KEY = String(BOOT.supabaseKey || '');
+
+  /** @param {any} res */
+  function unwrap(res) {
+    if (res && res.ok) return res.data;
+    var err = /** @type {any} */ (new Error((res && res.error) || 'Ukjent feil'));
+    err.code = (res && res.code) || 'ERROR';
+    throw err;
+  }
+
+  function netError(msg) {
+    var err = /** @type {any} */ (new Error(msg || 'Nettverksfeil'));
+    err.code = 'NETWORK';
+    return err;
+  }
+
+  /** @param {string} url @param {any} init @param {number} [timeoutMs] @returns {Promise<any>} */
+  function fetchJson(url, init, timeoutMs) {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var t = ctrl
+      ? setTimeout(function () {
+          ctrl.abort();
+        }, timeoutMs || 15000)
+      : null;
+    var opts = Object.assign({ cache: 'no-store', credentials: 'omit', signal: ctrl ? ctrl.signal : undefined }, init || {});
+    return fetch(url, opts).then(
+      function (r) {
+        if (t) clearTimeout(t);
+        return r.text().then(function (txt) {
+          var data = null;
+          try {
+            data = txt ? JSON.parse(txt) : null;
+          } catch (e) {
+            throw netError('Uventet svar fra serveren');
+          }
+          if (!r.ok && !(data && data.ok === false)) throw netError('HTTP ' + r.status);
+          return data;
+        });
+      },
+      function () {
+        if (t) clearTimeout(t);
+        throw netError();
+      }
+    );
+  }
+
+  /** Hodere for Supabase REST (publiserbar nøkkel – trygg i nettleseren). */
+  function restHeaders(json) {
+    /** @type {Record<string,string>} */
+    var h = { apikey: SB_KEY };
+    if (/^eyJ/.test(SB_KEY)) h.Authorization = 'Bearer ' + SB_KEY;
+    if (json) h['Content-Type'] = 'application/json';
+    return h;
+  }
+
+  /** Finner avstemningen stemmesiden skal vise (samme regler som motoren). @param {any} dir @param {string|null} key */
+  function resolveVotePoll(dir, key) {
+    var polls = (dir && dir.polls) || {};
+    var order = (dir && dir.order) || Object.keys(polls);
+    if (key) {
+      if (polls[key]) return key;
+      var pair = [key + '-before', key + '-after'].filter(function (id) {
+        return !!polls[id];
+      });
+      if (!pair.length) return null;
+      var open = pair.filter(function (id) {
+        return polls[id].status === 'open';
+      })[0];
+      if (open) return open;
+      return polls[pair[1]].status !== 'draft' ? pair[1] : pair[0];
+    }
+    var active = dir && dir.active;
+    if (active && polls[active] && polls[active].status === 'open') return active;
+    var firstOpen = order.filter(function (/** @type {string} */ id) {
+      return polls[id] && polls[id].status === 'open';
+    })[0];
+    return firstOpen || active || null;
+  }
+
+  /** @param {any} payload */
+  function voteState(payload) {
+    return fetchJson(SB_URL + '/rest/v1/isq_live?id=eq.1&select=data', { method: 'GET', headers: restHeaders(false) }, 12000).then(function (rows) {
+      var dir = (rows && rows[0] && rows[0].data) || {};
+      var id = resolveVotePoll(dir, payload && payload.poll ? String(payload.poll) : null);
+      return {
+        version: dir.version || 0,
+        event: dir.event || {},
+        poll: id && dir.polls && dir.polls[id] ? dir.polls[id] : null
+      };
+    });
+  }
+
+  /** @param {any} p */
+  function castVote(p) {
+    return fetchJson(
+      SB_URL + '/rest/v1/rpc/isq_cast_vote',
+      { method: 'POST', headers: restHeaders(true), body: JSON.stringify({ p_token: p.token, p_poll_id: p.pollId, p_choice: p.choice }) },
+      15000
+    ).then(unwrap);
+  }
+
+  /**
+   * Kall til Edge Function som «enkel» forespørsel (text/plain, ingen egne hodere),
+   * slik at nettleseren ikke trenger en ekstra CORS-runde før hvert trykk.
+   * @param {string} method @param {any} payload
+   */
+  function viaFunction(method, payload) {
+    return fetchJson(
+      SB_URL + '/functions/v1/isq',
+      { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ method: method, payload: payload || {} }) },
+      20000
+    ).then(unwrap);
+  }
+
+  /** @param {string} method @param {any} [payload] @returns {Promise<any>} */
+  function call(method, payload) {
+    if (!SB_URL) return Promise.reject(Object.assign(new Error('Mangler adressen til Supabase (config.js).'), { code: 'CONFIG' }));
+    if (method === 'public.voteState') return voteState(payload || {});
+    if (method === 'public.vote') return castVote(payload || {});
+    return viaFunction(method, payload || {});
+  }
+
+  // ---------- Sanntid ----------
+  /** @type {any} */
+  var sb = null;
+  /** @type {Record<string, Array<() => void>>} */
+  var listeners = {};
+  /** @type {Record<string, boolean>} */
+  var rtOk = {};
+  var rtStarted = false;
+
+  function startRealtime() {
+    if (rtStarted || !SB_URL || !SB_KEY) return;
+    if (!w.supabase || !w.supabase.createClient) {
+      // Biblioteket lastes asynkront fra CDN; prøv igjen litt senere
+      setTimeout(startRealtime, 1000);
+      return;
+    }
+    rtStarted = true;
+    try {
+      sb = w.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
+    } catch (e) {
+      return;
+    }
+    Object.keys(listeners).forEach(subscribeTable);
+  }
+
+  /** @param {string} table */
+  function subscribeTable(table) {
+    if (!sb) return;
+    sb.channel('isq-' + table + '-' + Math.random().toString(36).slice(2, 8))
+      .on('postgres_changes', { event: '*', schema: 'public', table: table }, function () {
+        (listeners[table] || []).forEach(function (fn) {
+          fn();
+        });
+      })
+      .subscribe(function (/** @type {string} */ status) {
+        var was = !!rtOk[table];
+        rtOk[table] = status === 'SUBSCRIBED';
+        // Etter ny tilkobling: hent tilstand i tilfelle vi gikk glipp av noe
+        if (rtOk[table] && !was)
+          (listeners[table] || []).forEach(function (fn) {
+            fn();
+          });
+      });
+  }
+
+  /** @param {string} table @param {() => void} fn */
+  function onChange(table, fn) {
+    var first = !listeners[table];
+    (listeners[table] = listeners[table] || []).push(fn);
+    if (sb && first) subscribeTable(table);
+    startRealtime();
+  }
+
+  // ---------- Klokke ----------
+  /** @type {{offset:number, rtt:number}[]} */
+  var samples = [];
+  var offset = 0;
+
+  /** @param {number} serverNow @param {number} sentAt @param {number} receivedAt */
+  function syncClock(serverNow, sentAt, receivedAt, waited) {
+    if (typeof serverNow !== 'number') return;
+    // Ved long-polling har serveren ventet en stund; trekk fra ventetiden
+    var rtt = Math.max(0, receivedAt - sentAt - (Number(waited) || 0));
+    samples.push({ offset: serverNow - (receivedAt - rtt / 2), rtt: rtt });
+    if (samples.length > 8) samples.shift();
+    var best = samples.reduce(function (a, b) {
+      return b.rtt < a.rtt ? b : a;
+    });
+    offset = best.offset;
+  }
+
+  function serverNow() {
+    return Date.now() + offset;
+  }
+
+  // ---------- Polling med gjenoppkobling ----------
+  /**
+   * interval: vanlig pollingintervall; rtInterval: intervall når sanntid (realtime: tabellnavn) er tilkoblet.
+   * minGap: minste tid mellom to henting utløst av sanntidsvarsler.
+   * @param {{method:string, payload?:()=>any, interval:number, rtInterval?:number, realtime?:string, minGap?:number,
+   *          hiddenInterval?:number, jitter?:number,
+   *          onData:(data:any)=>void, onStatus?:(online:boolean)=>void, onError?:(e:any)=>boolean|void}} o
+   */
+  function poller(o) {
+    var failures = 0;
+    var online = true;
+    var stopped = false;
+    /** @type {any} */
+    var timer = null;
+    var inFlight = false;
+    var lastStart = 0;
+    var dirty = false;
+
+    function schedule(ms) {
+      clearTimeout(timer);
+      if (!stopped) timer = setTimeout(tick, ms);
+    }
+    function setOnline(v) {
+      if (v !== online) {
+        online = v;
+        if (o.onStatus) o.onStatus(v);
+      }
+    }
+    function nextDelay() {
+      var rt = o.realtime && rtOk[o.realtime] && o.rtInterval;
+      var base = document.hidden && o.hiddenInterval ? Math.max(o.hiddenInterval, rt || 0) : rt || o.interval;
+      // Etter feil: prøv raskt igjen de første gangene, deretter gradvis sjeldnere
+      if (failures) base = failures <= 2 ? 300 : Math.min(1000 * Math.pow(1.5, failures - 2), 6000);
+      var j = o.jitter ? Math.random() * o.jitter : 0;
+      return base + j;
+    }
+    function tick() {
+      if (inFlight) {
+        dirty = true;
+        return;
+      }
+      inFlight = true;
+      dirty = false;
+      var sent = Date.now();
+      lastStart = sent;
+      var payload = o.payload ? o.payload() : {};
+      call(o.method, payload)
+        .then(function (data) {
+          inFlight = false;
+          failures = 0;
+          setOnline(true);
+          if (data && typeof data.serverNow === 'number') syncClock(data.serverNow, sent, Date.now(), 0);
+          o.onData(data);
+        })
+        .catch(function (e) {
+          inFlight = false;
+          var handled = o.onError ? o.onError(e) : false;
+          if (!handled) {
+            failures++;
+            // Vis «frakoblet» først når flere forsøk på rad har feilet
+            if (failures >= 3) setOnline(false);
+          }
+        })
+        .then(function () {
+          // Kom det et sanntidsvarsel mens vi hentet, hent på nytt med en gang
+          schedule(dirty && !failures ? Math.max(0, (o.minGap || 0) - (Date.now() - lastStart)) : nextDelay());
+        });
+    }
+    /** Sanntidsvarsel: hent snart, men ikke oftere enn minGap. */
+    function kick() {
+      if (stopped) return;
+      if (inFlight) {
+        dirty = true;
+        return;
+      }
+      schedule(Math.max(0, (o.minGap || 0) - (Date.now() - lastStart)));
+    }
+    if (o.realtime) onChange(o.realtime, kick);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) schedule(50);
+    });
+    w.addEventListener('online', function () {
+      schedule(50);
+    });
+    schedule(0);
+    return {
+      now: function () {
+        schedule(0);
+      },
+      stop: function () {
+        stopped = true;
+        clearTimeout(timer);
+      },
+      isOnline: function () {
+        return online;
+      }
+    };
+  }
+
+  // ---------- Lagring ----------
+  /** @type {Record<string,string>} */
+  var memory = {};
+  var storage = {
+    /** @param {string} k */
+    get: function (k) {
+      try {
+        var v = w.localStorage.getItem(k);
+        if (v != null) return v;
+      } catch (e) {
+        /* ignorert */
+      }
+      return Object.prototype.hasOwnProperty.call(memory, k) ? memory[k] : null;
+    },
+    /** @param {string} k @param {string} v */
+    set: function (k, v) {
+      memory[k] = v;
+      try {
+        w.localStorage.setItem(k, v);
+      } catch (e) {
+        /* ignorert */
+      }
+    },
+    /** @param {string} k */
+    remove: function (k) {
+      delete memory[k];
+      try {
+        w.localStorage.removeItem(k);
+      } catch (e) {
+        /* ignorert */
+      }
+    }
+  };
+
+  /** @param {number} [bytes] */
+  function randomToken(bytes) {
+    var n = bytes || 24;
+    var arr = new Uint8Array(n);
+    if (w.crypto && w.crypto.getRandomValues) w.crypto.getRandomValues(arr);
+    else for (var i = 0; i < n; i++) arr[i] = Math.floor(Math.random() * 256);
+    var s = '';
+    for (var j = 0; j < arr.length; j++) s += String.fromCharCode(arr[j]);
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  // ---------- DOM ----------
+  /** @param {any} s */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return /** @type {any} */ ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  /** @param {string} id @returns {any} */
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  /** Nettstedets rot-adresse (GitHub Pages), med skråstrek til slutt. */
+  function siteBase() {
+    var b = String(BOOT.siteUrl || '');
+    if (!b) {
+      // Utled fra denne sidens adresse: …/stem/, …/kontroll/ osv. ligger én mappe under roten
+      var here = location.href.split('?')[0].split('#')[0];
+      b = here.replace(/[^/]*$/, '');
+      if (/\/(stem|kontroll|admin|skjerm)\/$/.test(b)) b = b.replace(/[^/]+\/$/, '');
+    }
+    return b.replace(/\/*$/, '/');
+  }
+
+  /**
+   * Stemmesidens adresse: <nettsted>/stem/[?poll=s1]
+   * @param {string} [pollKey]
+   */
+  function voteUrl(pollKey) {
+    var url = siteBase() + 'stem/';
+    if (pollKey) url += '?poll=' + encodeURIComponent(pollKey);
+    return url;
+  }
+
+  return {
+    BOOT: BOOT,
+    call: call,
+    serverNow: serverNow,
+    syncClock: syncClock,
+    poller: poller,
+    storage: storage,
+    randomToken: randomToken,
+    esc: esc,
+    $: $,
+    voteUrl: voteUrl,
+    siteBase: siteBase,
+    onChange: onChange,
+    realtimeOk: function (/** @type {string} */ t) {
+      return !!rtOk[t];
+    }
+  };
+})();
+
+      // @ts-check
+/* global ISQ_Config, ISQ_Timer, ISQ_QR, ISQ_Client */
+/**
+ * Publikumsskjerm. Henter tilstand fra serveren hvert sekund, beholder siste
+ * kjente visning ved frakobling og regner timeren ut lokalt.
+ */
+(function () {
+  'use strict';
+
+  var C = ISQ_Config;
+  var T = ISQ_Timer;
+  var Q = ISQ_QR;
+  var cl = ISQ_Client;
+  var $ = cl.$;
+  var esc = cl.esc;
+  var BOOT = cl.BOOT;
+  var MEDIA = BOOT.media || {};
+
+  var VIEW_SECTION = {
+    hero: 'v-hero',
+    mainQuestion: 'v-mainQuestion',
+    statement: 'v-statement',
+    qr: 'v-qr',
+    team: 'v-speaker',
+    opening: 'v-speaker',
+    closing: 'v-speaker',
+    cross: 'v-cross',
+    result: 'v-result',
+    leaderboard: 'v-leaderboard',
+    mainResult: 'v-mainResult',
+    winner: 'v-winner',
+    rules: 'v-rules',
+    video: 'v-video',
+    black: 'v-black'
+  };
+  var CHOICES = ['against', 'neutral', 'for'];
+  var CLIENT_ID = cl.storage.get('isq-display-id') || cl.randomToken(9);
+  cl.storage.set('isq-display-id', CLIENT_ID);
+
+  /** @type {any} */
+  var state = null;
+  var shownSection = '';
+  var lastVersion = -1;
+  var missing = /** @type {Record<string, boolean>} */ ({});
+  /** @type {AudioContext|null} */
+  var audioCtx = null;
+  var audioUnlocked = false;
+
+  // ---------- Skalering av 16:9-scenen ----------
+  function scaleStage() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    $('stage').style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', scaleStage);
+  scaleStage();
+
+  // ---------- Media ----------
+  /** @param {string} key */
+  function mediaPath(key) {
+    var m = MEDIA || {};
+    if (key === 'hero') return m.hero || 'media/images/hero.jpg';
+    if (key === 'north') return m.north || 'media/images/lagnord.jpg';
+    if (key === 'south') return m.south || 'media/images/lagsør.jpg';
+    var v = C.VIDEOS.filter(function (x) {
+      return x.key === key;
+    })[0];
+    if (v) return (m.videos && m.videos[key]) || v.file;
+    var mu = C.MUSIC.filter(function (x) {
+      return x.key === key;
+    })[0];
+    if (mu) return (m.music && m.music[key]) || mu.file;
+    return '';
+  }
+
+  /** Sang som spilles samtidig med en video (standard: introvideoene). @param {string} videoKey */
+  var DEFAULT_SOUNDTRACKS = { introNorth: 'media/music/introlagnord.mp3', introSouth: 'media/music/introlagsør.mp3' };
+  function soundtrackPath(videoKey) {
+    var m = MEDIA || {};
+    var map = m.soundtracks || DEFAULT_SOUNDTRACKS;
+    return map[videoKey] || '';
+  }
+  /** Sekunder påstanden vises før en ekstravideo, hvis den ikke allerede står på skjermen. */
+  var PREROLL_MS = Math.max(0, Number(MEDIA && MEDIA.statementBeforeVideoSeconds != null ? MEDIA.statementBeforeVideoSeconds : 5)) * 1000;
+  var FADE_MS = Math.max(0, Number(MEDIA && MEDIA.soundtrackFadeSeconds != null ? MEDIA.soundtrackFadeSeconds : 3)) * 1000;
+  var VIDEO_SOUND_WITH_SOUNDTRACK = !!(MEDIA && MEDIA.videoSoundWithSoundtrack);
+  /** @param {string} path */
+  function markMissing(path) {
+    if (!missing[path]) {
+      missing[path] = true;
+      ping();
+    }
+  }
+
+  (function loadHero() {
+    var src = mediaPath('hero');
+    var img = new Image();
+    img.onload = function () {
+      var bg = $('bg');
+      bg.style.setProperty('--hero', 'url("' + encodeURI(src) + '")');
+      bg.classList.add('has-hero');
+    };
+    img.onerror = function () {
+      markMissing(src);
+    };
+    img.src = src;
+  })();
+
+  /** @type {Record<string, string>} */
+  var teamImgState = {};
+  /** @param {HTMLImageElement} img @param {HTMLElement} box @param {string} team */
+  function setTeamImage(img, box, team) {
+    var src = mediaPath(team);
+    box.classList.toggle('missing', teamImgState[team] === 'missing');
+    if (img.getAttribute('data-src') === src) return;
+    img.setAttribute('data-src', src);
+    img.onerror = function () {
+      teamImgState[team] = 'missing';
+      box.classList.add('missing');
+      markMissing(src);
+    };
+    img.onload = function () {
+      teamImgState[team] = 'ok';
+      box.classList.remove('missing');
+    };
+    img.src = src;
+  }
+
+  // ---------- Lyd ----------
+  function unlockAudio() {
+    try {
+      var AC = /** @type {any} */ (window).AudioContext || /** @type {any} */ (window).webkitAudioContext;
+      if (AC && !audioCtx) audioCtx = new AC();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      audioUnlocked = true;
+      $('muted').classList.remove('show');
+      var p = $('player');
+      if (p.src && !p.paused) p.muted = false;
+    } catch (e) {
+      /* ignorert */
+    }
+  }
+  function beep() {
+    if (!audioCtx || !state || !state.event.soundEnabled) return;
+    var t0 = audioCtx.currentTime;
+    [0, 0.35].forEach(function (d) {
+      var o = /** @type {AudioContext} */ (audioCtx).createOscillator();
+      var g = /** @type {AudioContext} */ (audioCtx).createGain();
+      o.type = 'sine';
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, t0 + d);
+      g.gain.exponentialRampToValueAtTime(0.5, t0 + d + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.28);
+      o.connect(g);
+      g.connect(/** @type {AudioContext} */ (audioCtx).destination);
+      o.start(t0 + d);
+      o.stop(t0 + d + 0.3);
+    });
+  }
+
+  // ---------- Startoverlegg og fullskjerm ----------
+  function toggleFullscreen() {
+    var d = /** @type {any} */ (document);
+    if (!d.fullscreenElement && !d.webkitFullscreenElement) {
+      var el = /** @type {any} */ (document.documentElement);
+      (el.requestFullscreen || el.webkitRequestFullscreen || function () {}).call(el);
+    } else {
+      (d.exitFullscreen || d.webkitExitFullscreen || function () {}).call(d);
+    }
+  }
+  $('startBtn').addEventListener('click', function () {
+    unlockAudio();
+    $('start').classList.add('hidden');
+    try {
+      toggleFullscreen();
+    } catch (e) {
+      /* ignorert */
+    }
+  });
+  $('muted').addEventListener('click', unlockAudio);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+  if (!BOOT.supabaseUrl) {
+    $('startWarn').hidden = false;
+    $('startWarn').textContent = 'Mangler adressen til Supabase. Åpne config.js i denne mappen og fyll inn supabaseUrl og supabaseKey.';
+  }
+  var cursorTimer = /** @type {any} */ (null);
+  document.addEventListener('mousemove', function () {
+    document.body.classList.remove('hide-cursor');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(function () {
+      document.body.classList.add('hide-cursor');
+    }, 3000);
+  });
+
+  // ---------- Hjelpere ----------
+  /** @param {string} team */
+  function teamName(team) {
+    return state && state.teams[team] ? state.teams[team].name : team === 'north' ? 'Lag Nord' : 'Lag Sør';
+  }
+  /** @param {number} no */
+  function statementOf(no) {
+    return (
+      (state.statements || []).filter(function (/** @type {any} */ s) {
+        return s.no === no;
+      })[0] || { text: '', no: no }
+    );
+  }
+  /** @param {string} p */
+  function posLabel(p) {
+    return p === 'for' ? 'FOR' : p === 'against' ? 'MOT' : String(p || '').toUpperCase();
+  }
+  /** @param {HTMLElement} el @param {string} text @param {number} limit */
+  function setLongText(el, text, limit) {
+    el.textContent = text;
+    el.classList.toggle('long', text.length > limit);
+  }
+  /** @param {number} n */
+  function signed(n) {
+    return (n > 0 ? '+' : n < 0 ? '−' : '±') + Math.abs(n);
+  }
+
+  // ---------- Rendring ----------
+  /** Visningen som skal vises nå, inkludert lokale overganger (video ferdig, sluttappell ute). */
+  // Ekstravideo: påstanden skal alltid vises før videoen. Står den ikke allerede på skjermen,
+  // vises den først i noen sekunder (f.eks. når videoen startes med en enkeltknapp).
+  var preroll = { nonce: '', until: 0, no: 0 };
+  var shownStatementNo = 0;
+  /** @param {any} st */
+  function checkPreroll(st) {
+    var v = st.video;
+    if (!v || st.view !== 'video' || v.nonce === preroll.nonce) return;
+    preroll.nonce = v.nonce;
+    preroll.until = 0;
+    var cfg = C.VIDEOS.filter(function (x) {
+      return x.key === v.key;
+    })[0];
+    var n = cfg && cfg.statement;
+    if (n && PREROLL_MS && !(shownSection === 'v-statement' && shownStatementNo === n)) {
+      preroll.until = Date.now() + PREROLL_MS;
+      preroll.no = n;
+    }
+  }
+
+  function effectiveView() {
+    var st = state;
+    var view = st.view;
+    if (view === 'video' && pendingReturn && st.video && st.video.nonce === pendingReturn.nonce) {
+      if (pendingReturn.statementNo) st.activeStatement = pendingReturn.statementNo;
+      return pendingReturn.view;
+    }
+    if (view === 'video' && st.video && preroll.nonce === st.video.nonce && Date.now() < preroll.until) {
+      st.activeStatement = preroll.no;
+      return 'statement';
+    }
+    var seg = st.segment;
+    var cfg = seg && C.SEGMENTS[seg.kind];
+    if (cfg && cfg.autoReturn && view === seg.kind && st.timer.status === 'running') {
+      if (T.signedRemainingMs(st.timer, cl.serverNow()) <= -C.AUTO_RETURN_GRACE_MS) return 'statement';
+    }
+    return view;
+  }
+
+  function render() {
+    var st = state;
+    var view = effectiveView();
+    if (view === 'video' && !st.video) view = st.previousView || 'hero';
+    var sectionId = VIEW_SECTION[/** @type {keyof typeof VIEW_SECTION} */ (view)] || 'v-hero';
+    if (sectionId !== shownSection) {
+      document.querySelectorAll('.view').forEach(function (e) {
+        e.classList.remove('active');
+      });
+      $(sectionId).classList.add('active');
+      shownSection = sectionId;
+      if (sectionId === 'v-result') lastResultKey = '';
+    }
+    $('demo').classList.toggle('show', !!st.event.demo);
+
+    // Hero
+    $('heroKicker').textContent = st.event.kicker || '';
+    // Forside: «I-Squared» med siste ledd i lagfarge
+    var title = String(st.event.heroTitle || st.event.title || '');
+    var cut = Math.max(title.lastIndexOf('-'), title.lastIndexOf(' '));
+    $('heroTitle').innerHTML = cut > 0 ? esc(title.slice(0, cut + 1)) + '<span>' + esc(title.slice(cut + 1)) + '</span>' : esc(title);
+    $('heroNorth').textContent = teamName('north').toUpperCase();
+    $('heroSouth').textContent = teamName('south').toUpperCase();
+
+    // Hovedspørsmål
+    setLongText($('mqText'), st.event.mainQuestion, 120);
+
+    // Påstand
+    var s = statementOf(st.activeStatement);
+    $('stNr').textContent = 'PÅSTAND ' + s.no;
+    if (sectionId === 'v-statement') shownStatementNo = s.no;
+    setLongText($('stText'), s.text, 110);
+    $('stPositions').innerHTML =
+      '<span><span class="north">' +
+      esc(teamName('north')) +
+      '</span> argumenterer <b>' +
+      posLabel(s.northPosition) +
+      '</b></span>' +
+      '<span><span class="south">' +
+      esc(teamName('south')) +
+      '</span> argumenterer <b>' +
+      posLabel(s.southPosition) +
+      '</b></span>';
+
+    if (sectionId === 'v-qr') renderQr();
+    if (sectionId === 'v-speaker') renderSpeaker(view);
+    if (sectionId === 'v-cross') renderCross();
+    if (sectionId === 'v-result') renderResult();
+    if (sectionId === 'v-leaderboard') renderLeaderboard();
+    if (sectionId === 'v-mainResult') renderFinal();
+    if (sectionId === 'v-winner') renderWinner();
+    if (sectionId === 'v-rules') renderRules();
+    syncVideo(view);
+    syncMusic();
+    handleFlash();
+  }
+
+  var qrCache = { url: '', svg: '' };
+  function renderQr() {
+    var p = state.qrPoll;
+    if (!p) {
+      $('qrLabel').textContent = 'AVSTEMNING';
+      $('qrTitle').textContent = 'Ingen avstemning er valgt';
+      $('qrAnswers').innerHTML = '';
+      $('qrCount').textContent = '0';
+      $('qrState').className = 'pollState';
+      $('qrState').textContent = '';
+      $('qrDist').innerHTML = '';
+    } else {
+      var phase = p.phase === 'before' ? 'FØR DEBATTEN' : 'ETTER DEBATTEN';
+      $('qrLabel').textContent = (p.type === 'main' ? 'HOVEDSPØRSMÅL' : 'PÅSTAND ' + p.statementNo) + ' • ' + phase;
+      setLongText($('qrTitle'), p.text, 120);
+      $('qrAnswers').innerHTML = CHOICES.map(function (c) {
+        return '<span class="answer">' + esc(p.labels[c]) + '</span>';
+      }).join('');
+      $('qrCount').textContent = String(p.count);
+      var st = $('qrState');
+      st.className = 'pollState ' + (p.status === 'open' ? 'open' : p.status === 'closed' ? 'closed' : '');
+      st.textContent = p.status === 'open' ? 'AVSTEMNINGEN ER ÅPEN' : p.status === 'closed' ? 'AVSTEMNINGEN ER STENGT' : 'ÅPNER SNART';
+      $('qrDist').innerHTML = p.distribution ? distBars(p.distribution, p.labels, p.count) : '';
+    }
+    var url = cl.voteUrl();
+    if (qrCache.url !== url) {
+      try {
+        qrCache.svg = Q.toSvg(url, { margin: 2, title: 'QR-kode: ' + url });
+      } catch (e) {
+        qrCache.svg = '';
+      }
+      qrCache.url = url;
+    }
+    var box = $('qrBox');
+    if (qrCache.svg && BOOT.supabaseUrl && /^https?:/.test(url)) {
+      box.classList.remove('off');
+      if (box.getAttribute('data-url') !== url) {
+        box.innerHTML = qrCache.svg;
+        box.setAttribute('data-url', url);
+      }
+    } else {
+      box.classList.add('off');
+      box.innerHTML = 'QR-kode mangler adresse.<br>Sett siteUrl i config.js';
+      box.removeAttribute('data-url');
+    }
+  }
+
+  /** @param {any} dist @param {any} labels @param {number} total */
+  function distBars(dist, labels, total) {
+    return CHOICES.map(function (c) {
+      var n = dist[c] || 0;
+      var pct = total ? Math.round((n / total) * 100) : 0;
+      return (
+        '<div class="distRow"><span>' +
+        esc(labels[c]) +
+        '</span><div class="bar"><i class="c-' +
+        c +
+        '" style="width:' +
+        pct +
+        '%"></i></div><span>' +
+        n +
+        '</span></div>'
+      );
+    }).join('');
+  }
+
+  /** @param {string} view */
+  function renderSpeaker(view) {
+    var team = view === 'team' ? state.activeTeam : (state.segment && state.segment.team) || state.activeTeam;
+    var south = team === 'south';
+    var card = $('speakerCard');
+    card.className = 'speaker ' + (south ? 'southMode teamSouth' : 'teamNorth');
+    var photo = $('spPhoto');
+    photo.className = 'photo ' + (south ? 's' : 'n');
+    $('spFallback').textContent = south ? 'S' : 'N';
+    setTeamImage($('spImg'), photo, team);
+    $('spImg').alt = teamName(team);
+    $('spTeam').textContent = teamName(team).toUpperCase();
+    $('spTeam').className = 'team ' + (south ? 'south' : 'north');
+    var labels = { team: 'Lagpresentasjon', opening: 'Åpningsinnlegg', closing: 'Sluttappell' };
+    $('spPhase').textContent = /** @type {any} */ (labels)[view] || '';
+    var s = statementOf(state.activeStatement);
+    var showStatement = view !== 'team';
+    $('spStatement').textContent = showStatement ? 'Påstand ' + s.no + ': ' + s.text : '';
+    var stance = south ? s.southPosition : s.northPosition;
+    $('spStance').textContent = showStatement ? 'ARGUMENTERER ' + posLabel(stance) : '';
+    $('spStance').style.display = showStatement ? '' : 'none';
+    $('spCards').innerHTML = C.CARDS.map(function (c) {
+      var used = state.cards[team] && state.cards[team][c.key];
+      return (
+        '<span class="card' +
+        (used ? ' used' : '') +
+        '" aria-label="' +
+        esc(c.name + (used ? ' – brukt' : ' – tilgjengelig')) +
+        '">' +
+        c.icon +
+        ' ' +
+        esc(c.title) +
+        '</span>'
+      );
+    }).join('');
+    $('spTimer').classList.toggle('hidden', view === 'team' && state.timer.status === 'idle');
+  }
+
+  function renderCross() {
+    var s = statementOf(state.activeStatement);
+    $('crossLabel').textContent = 'PÅSTAND ' + s.no;
+    $('crossStatement').textContent = s.text;
+    $('crossNName').textContent = teamName('north').toUpperCase();
+    $('crossSName').textContent = teamName('south').toUpperCase();
+    var active = (state.segment && state.segment.team) || state.activeTeam;
+    $('crossN').className = 'teamBox' + (active === 'north' ? ' activeN' : '');
+    $('crossS').className = 'teamBox' + (active === 'south' ? ' activeS' : '');
+    $('crossNTag').textContent = active === 'north' ? 'HAR ORDET' : '';
+    $('crossSTag').textContent = active === 'south' ? 'HAR ORDET' : '';
+  }
+
+  var lastResultKey = '';
+  function renderResult() {
+    var no = state.resultStatement || state.activeStatement;
+    var s = statementOf(no);
+    $('resLabel').textContent = 'PÅSTAND ' + no + ' – RESULTAT';
+    setLongText($('resText'), s.text, 110);
+    var r = state.result;
+    var key = r ? [r.statementNo, r.status, r.calculatedAt, r.approvedAt, r.north, r.south].join('|') : 'none';
+    if (key === lastResultKey) return;
+    lastResultKey = key;
+    var body = $('resBody');
+    if (!r || r.statementNo !== no) {
+      body.innerHTML = '<div class="verdict"><div class="sub">Resultatet er ikke klart ennå.</div></div>';
+      return;
+    }
+    if (r.pending) {
+      body.innerHTML = '<div class="verdict"><div class="big">…</div><div class="sub">Resultatet kontrolleres av juryen.</div></div>';
+      return;
+    }
+    var labels = C.CHOICE_LABELS;
+    var html = '';
+    if (r.before && r.after && r.mode !== 'manual') {
+      html +=
+        '<div class="compare"><div><h3>FØR DEBATTEN</h3><div class="dist">' +
+        distBars0(r.before, labels) +
+        '</div><div class="total">' +
+        r.beforeTotal +
+        ' stemmer</div></div><div><h3>ETTER DEBATTEN</h3><div class="dist">' +
+        distBars0(r.after, labels) +
+        '</div><div class="total">' +
+        r.afterTotal +
+        ' stemmer</div></div></div>';
+      html +=
+        '<div class="delta">' +
+        CHOICES.map(function (c) {
+          return '<span>' + labels[/** @type {'for'} */ (c)] + ' ' + signed(r.change[c]) + '</span>';
+        }).join('') +
+        '</div>';
+    }
+    html += '<div class="verdict">';
+    if (r.mode === 'manual') {
+      html += '<div class="big pop"><span class="north">' + r.north + '</span> – <span class="south">' + r.south + '</span></div>';
+      html += '<div class="sub">flyttede stemmer (' + esc(teamName('north')) + ' – ' + esc(teamName('south')) + ')</div>';
+    } else if (r.netMovement === 0) {
+      html += '<div class="big pop">0</div><div class="sub">Ingen netto flyttede stemmer</div>';
+    } else {
+      var dir = r.netMovement > 0 ? 'FOR' : 'MOT';
+      html += '<div class="big pop" id="resBig" data-target="' + Math.abs(r.netMovement) + '">0</div>';
+      html += '<div class="sub">flyttede stemmer mot ' + dir + '</div>';
+    }
+    if (r.winner) {
+      html += '<div class="winner pop ' + r.winner + '">' + esc(teamName(r.winner).toUpperCase()) + ' VINNER RUNDEN</div>';
+    } else {
+      html += '<div class="winner pop">UAVGJORT</div>';
+    }
+    if (r.mode === 'normalized') html += '<div><span class="badge">NORMALISERT BEREGNING</span></div>';
+    if (r.mode === 'manual' || r.overridden) html += '<div><span class="badge">MANUELT FASTSATT</span></div>';
+    html += '</div>';
+    body.innerHTML = html;
+    animateBars(body);
+    var big = $('resBig');
+    if (big) countUp(big, Number(big.getAttribute('data-target')));
+  }
+
+  /** @param {any} t @param {any} labels */
+  function distBars0(t, labels) {
+    var total = (t.against || 0) + (t.neutral || 0) + (t['for'] || 0);
+    return CHOICES.map(function (c) {
+      var n = t[c] || 0;
+      var pct = total ? Math.round((n / total) * 100) : 0;
+      return (
+        '<div class="distRow"><span>' +
+        esc(labels[c]) +
+        '</span><div class="bar"><i class="c-' +
+        c +
+        '" data-w="' +
+        pct +
+        '"></i></div><span>' +
+        n +
+        '</span></div>'
+      );
+    }).join('');
+  }
+  /** @param {HTMLElement} root */
+  function animateBars(root) {
+    var bars = root.querySelectorAll('i[data-w]');
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        bars.forEach(function (b) {
+          /** @type {HTMLElement} */ (b).style.width = b.getAttribute('data-w') + '%';
+        });
+      });
+    });
+  }
+  /** @param {HTMLElement} el @param {number} target */
+  function countUp(el, target) {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || target <= 1) {
+      el.textContent = String(target);
+      return;
+    }
+    var start = performance.now();
+    var dur = 1200;
+    function step(t) {
+      var k = Math.min(1, (t - start) / dur);
+      el.textContent = String(Math.round(target * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function renderLeaderboard() {
+    var lb = state.leaderboard;
+    $('lbNName').textContent = teamName('north').toUpperCase();
+    $('lbSName').textContent = teamName('south').toUpperCase();
+    $('lbNScore').textContent = String(lb.north);
+    $('lbSScore').textContent = String(lb.south);
+    $('lbN').classList.toggle('lead', lb.leader === 'north');
+    $('lbS').classList.toggle('lead', lb.leader === 'south');
+    var active = state.resultStatement;
+    /** @param {string} team */
+    function rows(team) {
+      return lb.rounds
+        .map(function (/** @type {any} */ r) {
+          var cls = 'round' + (!r.approved ? ' pending' : '') + (r.approved && r.winner === team ? ' win' : '');
+          var cur = r.statementNo === active && r.approved ? ' aria-current="true"' : '';
+          var star = r.approved && r.winner === team ? '<span class="star" aria-label="rundevinner">★</span>' : '';
+          return '<div class="' + cls + '"' + cur + '><span>Påstand ' + r.statementNo + '</span><span>' + (r.approved ? r[team] : '–') + star + '</span></div>';
+        })
+        .join('');
+    }
+    $('lbNRounds').innerHTML = rows('north');
+    $('lbSRounds').innerHTML = rows('south');
+  }
+
+  var lastFinalKey = '';
+  function renderFinal() {
+    var m = state.mainResult;
+    var lb = state.leaderboard;
+    var key = JSON.stringify([m, lb.north, lb.south]);
+    if (key === lastFinalKey) return;
+    lastFinalKey = key;
+    var html = '';
+    if (m) {
+      html +=
+        '<div class="compare"><div><h3>FØR</h3><div class="dist">' +
+        distBars0(m.before, m.labels) +
+        '</div><div class="total">' +
+        m.beforeTotal +
+        ' stemmer</div></div><div><h3>ETTER</h3><div class="dist">' +
+        distBars0(m.after, m.labels) +
+        '</div><div class="total">' +
+        m.afterTotal +
+        ' stemmer</div></div></div>';
+    }
+    if (m) {
+      var net = m.netMovement;
+      html +=
+        '<div class="delta" style="margin-top:34px">' +
+        CHOICES.map(function (c) {
+          return '<span>' + esc(m.labels[c]) + ' ' + signed(m.change[c]) + '</span>';
+        }).join('') +
+        '</div>';
+      html +=
+        '<div class="finalShift pop">' +
+        (net === 0 ? 'Salen står der den sto' : 'Salen flyttet seg ' + Math.abs(net) + ' stemmesteg mot ' + esc(net > 0 ? m.labels['for'] : m.labels.against)) +
+        '</div>';
+    }
+    html += '<div class="thanks">TAKK FOR I DAG</div>';
+    $('finalBody').innerHTML = html;
+    animateBars($('finalBody'));
+  }
+
+  var lastWinnerKey = '';
+  function renderWinner() {
+    var lb = state.leaderboard;
+    var key = JSON.stringify(lb);
+    if (key === lastWinnerKey) return;
+    lastWinnerKey = key;
+    var html = '';
+    if (lb.leader) {
+      html +=
+        '<div class="kicker gold">VINNER AV DEBATTEN</div><div class="winnerName pop ' + lb.leader + '">' + esc(teamName(lb.leader).toUpperCase()) + '</div>';
+    } else {
+      html += '<div class="kicker gold">DEBATTEN ENDTE</div><div class="winnerName pop">UAVGJORT</div>';
+    }
+    html +=
+      '<div class="winnerScore"><span class="north">' +
+      esc(teamName('north')) +
+      ' <b>' +
+      lb.north +
+      '</b></span><span class="dash">–</span><span class="south"><b>' +
+      lb.south +
+      '</b> ' +
+      esc(teamName('south')) +
+      '</span></div><div class="unit">FLYTTEDE STEMMER TOTALT</div>';
+    html +=
+      '<div class="winnerRounds">' +
+      lb.rounds
+        .map(function (/** @type {any} */ r) {
+          return (
+            '<div><span>Påstand ' +
+            r.statementNo +
+            '</span><b class="north">' +
+            (r.approved ? r.north : '–') +
+            '</b><b class="south">' +
+            (r.approved ? r.south : '–') +
+            '</b></div>'
+          );
+        })
+        .join('') +
+      '</div>';
+    $('winnerBody').innerHTML = html;
+  }
+
+  var rulesKey = '';
+  function renderRules() {
+    var d = state.event.durations || { opening: 180, cross: 240, closing: 60 };
+    var key = JSON.stringify(d);
+    if (key === rulesKey) return;
+    rulesKey = key;
+    /** @param {number} sec */
+    var mm = function (sec) {
+      var m = Math.floor(sec / 60);
+      var r = sec % 60;
+      if (!m) return r + ' sek';
+      return r ? m + ' min ' + r + ' sek' : m + ' min';
+    };
+    var steps = [
+      ['1', 'Før-avstemning', 'Salen stemmer MOT, NØYTRAL eller FOR på påstanden.'],
+      ['2', 'Åpningsinnlegg', mm(d.opening) + ' per lag. Lag Nord starter.'],
+      ['3', 'Kryssforhør', mm(d.cross) + ' per lag.'],
+      ['4', 'Sluttappell', mm(d.closing) + ' per lag.'],
+      ['5', 'Etter-avstemning', 'Salen stemmer på nytt.'],
+      ['6', 'Poeng', 'Laget som flytter flest stemmer i sin retning, vinner runden.']
+    ];
+    $('rulesFormat').innerHTML = steps
+      .map(function (x) {
+        return '<li><span class="no">' + x[0] + '</span><div><b>' + esc(x[1]) + '</b><span>' + esc(x[2]) + '</span></div></li>';
+      })
+      .join('');
+    $('rulesGrid').innerHTML = C.CARDS.map(function (c) {
+      return (
+        '<div class="ruleCard"><div class="icon" aria-hidden="true">' +
+        c.icon +
+        '</div><div class="t">' +
+        esc(c.title) +
+        '</div><div class="d">' +
+        esc(c.name + ': ' + c.text) +
+        '</div></div>'
+      );
+    }).join('');
+  }
+
+  // ---------- Timer ----------
+  var timerKey = '';
+  var wasPositive = false;
+  function tickTimer() {
+    if (state) {
+      var ms = T.remainingMs(state.timer, cl.serverNow());
+      var signedMs = T.signedRemainingMs(state.timer, cl.serverNow());
+      var sec = ms / 1000;
+      var phase = T.phase(sec);
+      var seg = state.segment;
+      var cfg = seg && C.SEGMENTS[seg.kind];
+      var overtime = !!(cfg && cfg.overtime && state.timer.status === 'running' && signedMs <= -1000);
+      var text = overtime ? T.formatSigned(signedMs / 1000) : phase === 'done' ? 'TID' : T.format(sec);
+      ['spTimer', 'crossTimer'].forEach(function (id) {
+        var el = $(id);
+        if (el.textContent !== text) el.textContent = text;
+        el.classList.toggle('warn', phase === 'warn');
+        el.classList.toggle('danger', phase === 'danger');
+        el.classList.toggle('done', phase === 'done' && !overtime);
+        el.classList.toggle('over', overtime);
+      });
+      // Sluttappell: bytt til påstanden lokalt med en gang tiden (+ «TID») er ute
+      if (shownSection && VIEW_SECTION[/** @type {keyof typeof VIEW_SECTION} */ (effectiveView())] !== shownSection) render();
+      var key = state.timer.status + '|' + state.timer.startedAt + '|' + state.timer.durationSeconds;
+      if (key !== timerKey) {
+        timerKey = key;
+        wasPositive = ms > 0;
+      } else if (wasPositive && ms <= 0 && state.timer.status === 'running') {
+        wasPositive = false;
+        if (['opening', 'cross', 'closing', 'team'].indexOf(state.view) !== -1) beep();
+      }
+    }
+    requestAnimationFrame(function () {
+      setTimeout(tickTimer, 100);
+    });
+  }
+
+  // ---------- Kort-flash ----------
+  var lastFlashId = '';
+  var flashTimer = /** @type {any} */ (null);
+  var firstState = true;
+  function handleFlash() {
+    var f = state.flash;
+    if (!f) {
+      if (lastFlashId) {
+        $('flash').classList.remove('show');
+        lastFlashId = '';
+      }
+      return;
+    }
+    if (f.id === lastFlashId) return;
+    lastFlashId = f.id;
+    if (firstState && cl.serverNow() - f.at > 8000) return;
+    var c = C.CARDS.filter(function (x) {
+      return x.key === f.key;
+    })[0];
+    if (!c) return;
+    $('flashIcon').textContent = c.icon;
+    $('flashTitle').textContent = teamName(f.team).toUpperCase() + ': ' + c.title;
+    $('flashText').textContent = c.text;
+    var el = $('flash');
+    el.className = 'flash show ' + f.team;
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () {
+      el.classList.remove('show');
+    }, 4500);
+  }
+
+  // ---------- Video ----------
+  var player = /** @type {HTMLVideoElement} */ ($('player'));
+  var currentNonce = '';
+  /** @type {{nonce:string, view:string, statementNo:number|null}|null} */
+  var pendingReturn = null;
+  /** @param {string} nonce @param {string} returnView @param {number|null} [returnStatement] */
+  function finishVideo(nonce, returnView, returnStatement) {
+    if (pendingReturn && pendingReturn.nonce === nonce) return;
+    pendingReturn = { nonce: nonce, view: returnView || 'hero', statementNo: returnStatement || null };
+    player.pause();
+    fadeOutSoundtrack();
+    if (state) render();
+    cl.call('public.videoEnded', { nonce: nonce }).catch(function () {
+      /* tilstanden rettes ved neste henting */
+    });
+  }
+  // ---------- Sang til video ----------
+  var soundtrack = /** @type {HTMLAudioElement} */ ($('soundtrack'));
+  var soundtrackOn = false;
+  var fadeTimer = /** @type {any} */ (null);
+  /** @param {string} src */
+  function startSoundtrack(src) {
+    clearInterval(fadeTimer);
+    soundtrackOn = true;
+    soundtrack.onerror = function () {
+      markMissing(src);
+      soundtrackOn = false;
+    };
+    soundtrack.src = src;
+    soundtrack.volume = 1;
+    try {
+      soundtrack.currentTime = 0;
+    } catch (e) {
+      /* ignorert */
+    }
+    soundtrack.play().catch(function () {
+      $('muted').classList.add('show');
+    });
+  }
+  /** Fader sangen ned (standard 3 sekunder) og stopper den. */
+  function fadeOutSoundtrack() {
+    if (!soundtrackOn) return;
+    soundtrackOn = false;
+    clearInterval(fadeTimer);
+    if (soundtrack.paused || !FADE_MS) {
+      soundtrack.pause();
+      return;
+    }
+    var start = soundtrack.volume;
+    var t0 = Date.now();
+    fadeTimer = setInterval(function () {
+      var k = Math.min(1, (Date.now() - t0) / FADE_MS);
+      soundtrack.volume = Math.max(0, start * (1 - k));
+      if (k >= 1) {
+        clearInterval(fadeTimer);
+        soundtrack.pause();
+      }
+    }, 50);
+  }
+
+  function tryPlay() {
+    player.muted = !audioUnlocked || (soundtrackOn && !VIDEO_SOUND_WITH_SOUNDTRACK);
+    var pr = player.play();
+    if (pr && pr.catch) {
+      pr.then(function () {
+        if (player.muted) $('muted').classList.add('show');
+      }).catch(function () {
+        player.muted = true;
+        $('muted').classList.add('show');
+        player.play().catch(function () {
+          /* ignorert */
+        });
+      });
+    }
+  }
+  /** @param {string} view */
+  function syncVideo(view) {
+    var v = view === 'video' ? state.video : null;
+    if (!v) {
+      if (currentNonce) {
+        player.pause();
+        player.removeAttribute('src');
+        player.load();
+        currentNonce = '';
+        fadeOutSoundtrack();
+        $('videoMissing').classList.remove('show');
+      }
+      return;
+    }
+    if (v.nonce !== currentNonce) {
+      currentNonce = v.nonce;
+      var src = mediaPath(v.key);
+      $('videoMissing').classList.remove('show');
+      player.onended = function () {
+        finishVideo(v.nonce, v.returnView, v.returnStatement);
+      };
+      player.onerror = function () {
+        markMissing(src);
+        $('videoMissing').textContent = 'Finner ikke videoen: ' + src;
+        $('videoMissing').classList.add('show');
+        setTimeout(function () {
+          finishVideo(v.nonce, v.returnView, v.returnStatement);
+        }, 4000);
+      };
+      player.src = src;
+      try {
+        player.currentTime = 0;
+      } catch (e) {
+        /* ignorert */
+      }
+      var track = soundtrackPath(v.key);
+      if (track && v.status === 'playing') startSoundtrack(track);
+      else fadeOutSoundtrack();
+      if (v.status === 'playing') tryPlay();
+    } else if (v.status === 'paused' && !player.paused) {
+      player.pause();
+      if (soundtrackOn) soundtrack.pause();
+    } else if (v.status === 'playing' && player.paused && !player.ended && !$('videoMissing').classList.contains('show')) {
+      tryPlay();
+      if (soundtrackOn && soundtrack.paused) soundtrack.play().catch(function () {});
+    }
+  }
+
+  // ---------- Musikk ----------
+  var music = /** @type {HTMLAudioElement} */ ($('music'));
+  var musicNonce = '';
+  function syncMusic() {
+    var m = state.music;
+    if (!m) {
+      if (musicNonce) {
+        music.pause();
+        musicNonce = '';
+      }
+      return;
+    }
+    if (m.nonce !== musicNonce) {
+      musicNonce = m.nonce;
+      var src = mediaPath(m.key);
+      music.onerror = function () {
+        markMissing(src);
+      };
+      music.src = src;
+      music.volume = 0.7;
+      music.play().catch(function () {
+        $('muted').classList.add('show');
+      });
+    }
+  }
+
+  // ---------- Tilkobling ----------
+  function ping() {
+    cl.call('public.displayPing', {
+      clientId: CLIENT_ID,
+      missing: Object.keys(missing).join(', ').slice(0, 1900),
+      version: lastVersion > 0 ? lastVersion : 0,
+      mode: BOOT.mode || 'local'
+    }).catch(function () {
+      /* ignorert */
+    });
+  }
+
+  cl.poller({
+    method: 'public.state',
+    interval: 1000,
+    rtInterval: 1500,
+    realtime: 'isq_tick',
+    minGap: 300,
+    hiddenInterval: 3000,
+    onData: function (data) {
+      if (state && data.version < state.version) return; // eldre svar som kom sent
+      state = data;
+      if (pendingReturn && (!data.video || data.video.nonce !== pendingReturn.nonce)) pendingReturn = null;
+      checkPreroll(data);
+      if (data.version !== lastVersion || shownSection === '') {
+        lastVersion = data.version;
+        render();
+        firstState = false;
+      } else {
+        handleFlash();
+        if (shownSection === 'v-qr') renderQr();
+      }
+    },
+    onStatus: function (online) {
+      $('offline').classList.toggle('show', !online);
+    }
+  });
+  setInterval(ping, 10000);
+  setTimeout(ping, 1500);
+  tickTimer();
+})();
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "i-squared-statsbygg",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Live debattapp for I-Squared Statsbygg – Supabase (database + Edge Function), nettsted på GitHub Pages og lokal publikumsskjerm på Mac.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && node dev/server.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{js,css}\" \"dev/**/*.{js,mjs}\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\"",
+    "format:check": "prettier --check \"src/**/*.{js,css}\" \"dev/**/*.{js,mjs}\" \"scripts/**/*.mjs\" \"tests/**/*.mjs\"",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test \"tests/unit/*.test.mjs\" \"tests/integration/*.test.mjs\"",
+    "test:e2e": "node scripts/build.mjs && node --test --test-concurrency=1 \"tests/e2e/*.test.mjs\"",
+    "check": "npm run lint && npm run typecheck && npm run build && npm test && npm run test:e2e"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.0",
+    "eslint": "^10.1.0",
+    "playwright": "^1.56.1",
+    "prettier": "^3.8.0",
+    "typescript": "^6.0.2"
+  }
+}

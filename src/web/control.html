@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1119" />
+    <title>Kontroll • I-Squared Statsbygg</title>
+    <style>
+      <!--@css:base.css-->
+      <!--@css:control.css-->
+    </style>
+    <!--@boot-->
+  </head>
+  <body>
+    <section id="login" hidden>
+      <h1>Kontrollflate</h1>
+      <p class="muted" id="loginTitle">I-Squared Statsbygg</p>
+      <form id="loginForm" class="card" autocomplete="off">
+        <label for="pin">Administrator-PIN</label>
+        <input id="pin" name="pin" type="password" autocomplete="current-password" required minlength="1" />
+        <div style="height: 12px"></div>
+        <button class="btn big blue" type="submit" id="loginBtn">Logg inn</button>
+        <p id="loginErr" class="small" role="alert" style="color: #ffb4a6"></p>
+      </form>
+    </section>
+
+    <div id="app" hidden>
+      <header class="top">
+        <div class="topRow">
+          <div class="topTitle" id="appTitle">I-Squared • Kontroll</div>
+          <div class="conn" role="status" aria-live="polite">
+            <span class="dot" id="connDot" aria-hidden="true"></span><span id="connText">Tilkoblet</span>
+          </div>
+        </div>
+        <div class="chips">
+          <div class="chip"><span class="k">Skjerm</span><span class="v" id="chipView">–</span></div>
+          <div class="chip"><span class="k">Påstand</span><span class="v" id="chipStatement">–</span></div>
+          <div class="chip" id="chipTimerBox"><span class="k" id="chipTimerK">Timer</span><span class="v timerV" id="chipTimer">–</span></div>
+          <div class="chip"><span class="k">Avstemning</span><span class="v" id="chipPoll">–</span></div>
+          <div class="chip"><span class="k">Stemmer</span><span class="v num" id="chipVotes">0</span></div>
+          <div class="chip"><span class="k">Nord – Sør</span><span class="v num" id="chipScore">0 – 0</span></div>
+        </div>
+      </header>
+
+      <main>
+        <section class="tab active" id="tab-run" role="tabpanel" aria-labelledby="t-run"></section>
+        <section class="tab" id="tab-poll" role="tabpanel" aria-labelledby="t-poll"></section>
+        <section class="tab" id="tab-timer" role="tabpanel" aria-labelledby="t-timer"></section>
+        <section class="tab" id="tab-cards" role="tabpanel" aria-labelledby="t-cards"></section>
+        <section class="tab" id="tab-results" role="tabpanel" aria-labelledby="t-results"></section>
+        <section class="tab" id="tab-media" role="tabpanel" aria-labelledby="t-media"></section>
+        <section class="tab" id="tab-admin" role="tabpanel" aria-labelledby="t-admin"></section>
+      </main>
+
+      <nav class="tabbar" role="tablist" aria-label="Seksjoner">
+        <button id="t-run" role="tab" data-tab="run" aria-selected="true" aria-label="Kjøreplan" title="Kjøreplan"><span class="i" aria-hidden="true">▶︎</span>PLAN</button>
+        <button id="t-poll" role="tab" data-tab="poll" aria-selected="false" aria-label="Avstemning" title="Avstemning"><span class="i" aria-hidden="true">🗳</span>AVSTEM</button>
+        <button id="t-timer" role="tab" data-tab="timer" aria-selected="false" aria-label="Timer" title="Timer"><span class="i" aria-hidden="true">⏱</span>TIMER</button>
+        <button id="t-cards" role="tab" data-tab="cards" aria-selected="false" aria-label="Spillekort" title="Spillekort"><span class="i" aria-hidden="true">🟨</span>KORT</button>
+        <button id="t-results" role="tab" data-tab="results" aria-selected="false" aria-label="Resultater" title="Resultater"><span class="i" aria-hidden="true">🏆</span>RESULTAT</button>
+        <button id="t-media" role="tab" data-tab="media" aria-selected="false" aria-label="Media" title="Media"><span class="i" aria-hidden="true">🎬</span>MEDIA</button>
+        <button id="t-admin" role="tab" data-tab="admin" aria-selected="false" aria-label="Admin" title="Admin"><span class="i" aria-hidden="true">⚙︎</span>ADMIN</button>
+      </nav>
+
+      <div id="toast" class="toast" role="alert"></div>
+
+      <div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="box">
+          <h3 id="modalTitle">Bekreft</h3>
+          <p id="modalText"></p>
+          <div id="modalExtra"></div>
+          <div class="grid" style="margin-top: 12px">
+            <button class="btn ghost" type="button" id="modalCancel">Avbryt</button>
+            <button class="btn danger" type="button" id="modalOk">Bekreft</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      <!--@js:../shared/config.js-->
+      <!--@js:../shared/timer.js-->
+      <!--@js:../shared/qr.js-->
+      <!--@js:client.js-->
+      <!--@js:control.js-->
+    </script>
+  </body>
+</html>

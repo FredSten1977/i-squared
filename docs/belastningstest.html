@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Belastningstest • I-Squared</title>
+    <style>
+      body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: #0b1119; color: #f4f7fb; margin: 0; padding: 24px; }
+      main { max-width: 760px; margin: 0 auto; }
+      h1 { margin: 0 0 6px; font-size: 28px; }
+      p, li { color: #b8c6d4; line-height: 1.5; }
+      .card { background: #131d29; border: 1px solid #26374b; border-radius: 14px; padding: 18px; margin: 16px 0; }
+      label { display: block; font-size: 14px; color: #9fb0c1; margin: 10px 0 4px; }
+      input, select { font: inherit; padding: 10px; border-radius: 8px; border: 1px solid #26374b; background: #0d1621; color: #fff; width: 100%; box-sizing: border-box; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      button { font: inherit; font-weight: 800; font-size: 18px; padding: 14px 20px; border-radius: 10px; border: 2px solid #ffd166; background: #725c10; color: #fff; cursor: pointer; width: 100%; margin-top: 14px; }
+      button[disabled] { opacity: 0.5; cursor: progress; }
+      .bar { height: 14px; background: #ffffff14; border-radius: 7px; overflow: hidden; margin: 12px 0; }
+      .bar i { display: block; height: 100%; width: 0; background: #57d68d; transition: width 0.2s; }
+      .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .stat { background: #0d1621; border-radius: 10px; padding: 12px; text-align: center; }
+      .stat b { display: block; font-size: 28px; }
+      .stat span { font-size: 13px; color: #9fb0c1; }
+      .verdict { font-size: 20px; font-weight: 800; padding: 14px; border-radius: 10px; margin-top: 14px; }
+      .ok { background: #10281b; border: 1px solid #57d68d; }
+      .warn { background: #2b2410; border: 1px solid #ffd166; }
+      .bad { background: #3b1111; border: 1px solid #ff654f; }
+      code { background: #0d1621; padding: 2px 6px; border-radius: 4px; }
+    </style>
+    <script src="config.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>Belastningstest</h1>
+      <p>Sender mange stemmer mot den ekte databasen i Supabase (adressen i <code>config.js</code>), slik som når salen stemmer samtidig, og måler hvor mange som kommer fram og hvor lang tid det tar.</p>
+      <div class="card">
+        <ol>
+          <li>Åpne en avstemning på kontrollflaten (f.eks. «Åpne før-avstemning» på påstand 1).</li>
+          <li>Velg antall stemmer og hvor raskt de skal komme, og trykk <b>Start</b>.</li>
+          <li><b>Etterpå:</b> ADMIN → <b>Nullstill hele arrangementet</b> (teststemmene er vanlige stemmer).</li>
+        </ol>
+        <div class="row">
+          <div><label for="n">Antall stemmer</label><input id="n" type="number" value="100" min="1" max="300" /></div>
+          <div>
+            <label for="spread">Hvor raskt</label>
+            <select id="spread">
+              <option value="3">Alle innen 3 sekunder (verste tilfelle)</option>
+              <option value="15" selected>Spredt over 15 sekunder (realistisk)</option>
+              <option value="40">Spredt over 40 sekunder (rolig)</option>
+            </select>
+          </div>
+        </div>
+        <button id="go" type="button">Start test</button>
+        <div class="bar"><i id="prog"></i></div>
+        <div class="stats">
+          <div class="stat"><b id="sOk">0</b><span>kom fram</span></div>
+          <div class="stat"><b id="sErr">0</b><span>feilet</span></div>
+          <div class="stat"><b id="sRetry">0</b><span>måtte prøve igjen</span></div>
+          <div class="stat"><b id="sMed">–</b><span>typisk tid (median)</span></div>
+          <div class="stat"><b id="sP95">–</b><span>9 av 10 innen</span></div>
+          <div class="stat"><b id="sMax">–</b><span>tregeste</span></div>
+        </div>
+        <div id="verdict"></div>
+        <p id="info"></p>
+      </div>
+    </main>
+    <script>
+      (function () {
+        var cfg = window.ISQ_CONFIG || {};
+        var sbUrl = String(cfg.supabaseUrl || '').replace(/\/+$/, '');
+        var sbKey = String(cfg.supabaseKey || '');
+        var $ = function (id) { return document.getElementById(id); };
+        if (!sbUrl) $('info').textContent = 'Fant ingen supabaseUrl i config.js.';
+        function headers(json) {
+          var h = { apikey: sbKey };
+          if (/^eyJ/.test(sbKey)) h.Authorization = 'Bearer ' + sbKey;
+          if (json) h['Content-Type'] = 'application/json';
+          return h;
+        }
+
+        function token() {
+          var a = new Uint8Array(18);
+          crypto.getRandomValues(a);
+          return 'last' + Array.from(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+        }
+        function castVote(p) {
+          return fetch(sbUrl + '/rest/v1/rpc/isq_cast_vote', {
+            method: 'POST', cache: 'no-store', credentials: 'omit', headers: headers(true),
+            body: JSON.stringify({ p_token: p.token, p_poll_id: p.pollId, p_choice: p.choice })
+          }).then(function (r) { return r.json(); });
+        }
+        function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+        function fmt(ms) { return ms == null ? '–' : (ms / 1000).toFixed(1) + ' s'; }
+
+        $('go').addEventListener('click', function () {
+          var n = Math.max(1, Math.min(300, Number($('n').value) || 100));
+          var spread = Number($('spread').value) * 1000;
+          var btn = $('go');
+          btn.disabled = true;
+          $('verdict').innerHTML = '';
+          $('info').textContent = 'Finner åpen avstemning …';
+          fetch(sbUrl + '/rest/v1/isq_live?id=eq.1&select=data', { credentials: 'omit', cache: 'no-store', headers: headers(false) })
+            .then(function (r) { return r.json(); })
+            .then(function (rows) {
+              var dir = (rows && rows[0] && rows[0].data) || {};
+              var polls = dir.polls || {};
+              var id = dir.active && polls[dir.active] && polls[dir.active].status === 'open' ? dir.active : (dir.order || []).filter(function (x) { return polls[x] && polls[x].status === 'open'; })[0];
+              var poll = id ? polls[id] : null;
+              if (!poll || poll.status !== 'open') throw new Error('Ingen avstemning er åpen. Åpne en avstemning på kontrollflaten først.');
+              $('info').textContent = 'Sender ' + n + ' stemmer til «' + poll.id + '» …';
+              var ok = 0, err = 0, retries = 0, done = 0, times = [];
+              var choices = ['against', 'neutral', 'for'];
+              function update() {
+                $('sOk').textContent = ok; $('sErr').textContent = err; $('sRetry').textContent = retries;
+                $('prog').style.width = Math.round((done / n) * 100) + '%';
+              }
+              function one(i) {
+                var t = token();
+                var choice = choices[i % 3];
+                var start = Date.now();
+                function attempt(k) {
+                  return castVote({ token: t, choice: choice, pollId: poll.id })
+                    .then(function (r) {
+                      if (r.ok) return true;
+                      if (k < 3 && (r.code === 'BUSY' || r.code === 'INTERNAL' || !r.code)) { retries++; return sleep(800 * (k + 1)).then(function () { return attempt(k + 1); }); }
+                      throw new Error(r.error || r.code);
+                    }, function (e) {
+                      if (k < 3) { retries++; return sleep(800 * (k + 1)).then(function () { return attempt(k + 1); }); }
+                      throw e;
+                    });
+                }
+                return sleep(Math.random() * spread).then(function () {
+                  start = Date.now();
+                  return attempt(0);
+                }).then(function () { ok++; times.push(Date.now() - start); }, function () { err++; })
+                  .then(function () { done++; update(); });
+              }
+              var all = [];
+              for (var i = 0; i < n; i++) all.push(one(i));
+              return Promise.all(all).then(function () {
+                times.sort(function (a, b) { return a - b; });
+                var med = times.length ? times[Math.floor(times.length / 2)] : null;
+                var p95 = times.length ? times[Math.min(times.length - 1, Math.floor(times.length * 0.9))] : null;
+                var max = times.length ? times[times.length - 1] : null;
+                $('sMed').textContent = fmt(med); $('sP95').textContent = fmt(p95); $('sMax').textContent = fmt(max);
+                var cls, msg;
+                if (err === 0 && p95 != null && p95 <= 4000) { cls = 'ok'; msg = '✓ Bra: alle stemmene kom fram raskt.'; }
+                else if (err <= Math.ceil(n * 0.02) && p95 != null && p95 <= 10000) { cls = 'warn'; msg = '⚠︎ Akseptabelt: nesten alt kom fram, men noen måtte vente. Følg med på stemmetallet og gi salen litt ekstra tid.'; }
+                else { cls = 'bad'; msg = '✗ For svakt: mange stemmer feilet eller tok lang tid. Sjekk nettet i salen og loggene i Supabase.'; }
+                $('verdict').innerHTML = '<div class="verdict ' + cls + '">' + msg + '</div>';
+                $('info').textContent = 'Husk: ADMIN → Nullstill hele arrangementet etter testen.';
+              });
+            })
+            .catch(function (e) { $('info').textContent = 'Feil: ' + e.message; })
+            .then(function () { btn.disabled = false; });
+        });
+      })();
+    </script>
+  </body>
+</html>
