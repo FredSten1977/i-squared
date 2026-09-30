@@ -336,6 +336,7 @@ body.hide-cursor {
   color: #ffd3cc;
 }
 .speech {
+  min-height: 0;
   padding: 60px 70px;
   display: flex;
   flex-direction: column;
@@ -359,9 +360,12 @@ body.hide-cursor {
   line-height: 0.9;
   letter-spacing: -0.07em;
   font-variant-numeric: tabular-nums;
-  margin: 34px 0;
+  margin: 26px 0 30px;
   color: #fff;
   transition: color 0.3s;
+}
+.speech .timer {
+  font-size: 220px;
 }
 .timer.warn {
   color: var(--gold);
@@ -378,9 +382,19 @@ body.hide-cursor {
   display: none;
 }
 .smallStatement {
-  font-size: 28px;
-  line-height: 1.35;
-  color: #c6d2dd;
+  font-size: 48px;
+  line-height: 1.22;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.smallStatement .stLabel {
+  display: block;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  color: var(--gold);
+  margin-bottom: 8px;
 }
 .stance {
   display: inline-block;

@@ -401,7 +401,7 @@
     $('spPhase').textContent = /** @type {any} */ (labels)[view] || '';
     var s = statementOf(state.activeStatement);
     var showStatement = view !== 'team';
-    $('spStatement').textContent = showStatement ? 'Påstand ' + s.no + ': ' + s.text : '';
+    $('spStatement').innerHTML = showStatement ? '<span class="stLabel">PÅSTAND ' + s.no + '</span>' + esc(s.text) : '';
     var stance = south ? s.southPosition : s.northPosition;
     $('spStance').textContent = showStatement ? 'ARGUMENTERER ' + posLabel(stance) : '';
     $('spStance').style.display = showStatement ? '' : 'none';
@@ -420,6 +420,48 @@
       );
     }).join('');
     $('spTimer').classList.toggle('hidden', view === 'team' && state.timer.status === 'idle');
+    fitSpeakerStatement(0);
+  }
+
+  /**
+   * Påstanden på talerbildet vises stort, men krympes trinnvis hvis en lang påstand
+   * ikke får plass i kolonnen (f.eks. når timeren og kortene også vises).
+   * @param {number} attempt
+   */
+  function fitSpeakerStatement(attempt) {
+    var el = $('spStatement');
+    var box = /** @type {HTMLElement} */ (el.parentNode);
+    el.style.fontSize = '';
+    if (!el.textContent) return;
+    if (!$('speakerCard').offsetHeight) {
+      // Visningen er ikke synlig ennå – mål når den er vist
+      if (attempt < 5)
+        setTimeout(function () {
+          fitSpeakerStatement(attempt + 1);
+        }, 100);
+      return;
+    }
+    var size = 48;
+    while (speechOverflows(box) && size > 28) {
+      size -= 2;
+      el.style.fontSize = size + 'px';
+    }
+    // Mål på nytt når visningen har lagt seg (overgang, skrifttyper)
+    if (attempt === 0)
+      setTimeout(function () {
+        fitSpeakerStatement(1);
+      }, 400);
+  }
+  /** Går innholdet i talerkolonnen utenfor kortet (med luft til kanten)? @param {HTMLElement} box */
+  function speechOverflows(box) {
+    // Kolonnen vokser med innholdet; kortet (fast høyde, skjuler overflyt) er grensen
+    var card = $('speakerCard');
+    var r = card.getBoundingClientRect();
+    var scale = card.offsetHeight ? r.height / card.offsetHeight : 1;
+    var pad = 40 * scale;
+    var first = /** @type {HTMLElement} */ (box.firstElementChild);
+    var last = /** @type {HTMLElement} */ (box.lastElementChild);
+    return first.getBoundingClientRect().top < r.top + pad || last.getBoundingClientRect().bottom > r.bottom - pad;
   }
 
   function renderCross() {
