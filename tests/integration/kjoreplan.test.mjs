@@ -156,11 +156,16 @@ test('innslaget steg 1–22 med «Neste»-knappen', () => {
   assert.equal(p.view, 'qr');
   assert.equal(p.poll.id, 'main-before');
   h.voteAll('main-before', ['against', 'against', 'neutral', 'for']);
-  // 4–5: lukkes → rett til debattreglene
+  // 4: lukkes → rett til debattreglene
   h.next();
   assert.equal(h.pub().view, 'rules');
   assert.equal(h.ctl().polls['main-before'].status, 'closed');
   assert.deepEqual(h.pub().event.durations, { opening: 180, cross: 240, closing: 60, team: 60 });
+  // 5: debattintro → tilbake til debattregler
+  h.next();
+  assert.equal(h.pub().video.key, 'introDebate');
+  h.videoEnds();
+  assert.equal(h.pub().view, 'rules');
   // 6: introvideo Nord → tilbake til debattregler
   h.next();
   assert.equal(h.pub().video.key, 'introNorth');
@@ -223,6 +228,9 @@ test('manuell overstyring: «Neste» fortsetter fra det operatøren gjorde manue
   const h = setup();
   // Operatøren hopper rett til debattreglene manuelt
   h.act('setView', { view: 'rules' });
+  assert.equal(h.ctl().nextStep.label, 'Debattintro (→ regler)');
+  // … og spiller debattintroen manuelt → neste er introvideo Nord
+  h.act('playVideo', { key: 'introDebate' });
   assert.equal(h.ctl().nextStep.label, 'Introvideo Lag Nord (→ regler)');
   // … velger påstand 2 og starter kryssforhør Sør manuelt
   h.act('selectStatement', { statementNo: 2 });

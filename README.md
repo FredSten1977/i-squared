@@ -115,7 +115,7 @@ Vil du heller ha repoet privat, kan `docs/` legges på Netlify eller Vercel (dra
 ## 3. Publikumsskjermen på Mac-en
 
 1. Mappen `dist/display/` er skjermmappen. `config.js` peker allerede til Supabase og nettstedet (`siteUrl`, som QR-koden bruker).
-2. Mediefiler i `media/` (uendret fra før): `images/hero.jpg`, `images/lagnord.jpg`, `images/lagsør.jpg`, `video/Introvideonord.mp4`, `video/Introvideosør.mp4`, `video/ekstravideopåstand1-3.mp4`, `music/introlagnord.mp3`, `music/introlagsør.mp3`, valgfritt `music/innmarsj.mp3` og `pause.mp3`.
+2. Mediefiler i `media/` (uendret fra før): `images/hero.jpg`, `images/lagnord.jpg`, `images/lagsør.jpg`, `video/introdebatt.mp4` (debattintro med innbakt sang), `video/Introvideonord.mp4`, `video/Introvideosør.mp4`, `video/ekstravideopåstand1-3.mp4`, `music/introlagnord.mp3`, `music/introlagsør.mp3`, valgfritt `music/innmarsj.mp3` og `pause.mp3`.
 3. Åpne `index.html` i **Google Chrome** og trykk **Start publikumsskjerm** (F = fullskjerm).
 4. Kontrollflaten viser under **MEDIA** om skjermen er tilkoblet og hvilke filer som mangler.
 

@@ -50,7 +50,7 @@ Du kan når som helst **overstyre manuelt**:
 - Alle knappene under NESTE (Start, Påstand n, Avslutning, Annet) virker uavhengig av kjøreplanen.
 - Trykker du en knapp som tilsvarer et steg i kjøreplanen, flytter NESTE seg dit og fortsetter derfra. Eksempel: trykker du manuelt «Kryssforhør Sør», er neste steg «Tilbake til påstand».
 - Knapper som ikke er i kjøreplanen (svart skjerm, leaderboard, spillekort), flytter ikke NESTE.
-- **Hele kjøreplanen** (sammenleggbar liste) viser alle 55 stegene. Trykk på et steg for å hoppe dit og utføre det.
+- **Hele kjøreplanen** (sammenleggbar liste) viser alle 57 stegene. Trykk på et steg for å hoppe dit og utføre det.
 - Under en debattdel vises også en stor **Tilbake til påstand**-knapp.
 
 ## 4. Kjøreplan
@@ -60,7 +60,8 @@ Du kan når som helst **overstyre manuelt**:
 | 1 | Forside | «I-Squared», Lag Nord mot Lag Sør, hero.jpg som bakgrunn |
 | 2 | Vis hovedspørsmål | Hovedspørsmålet i stor tekst |
 | 3 | Åpne avstemning: hovedspørsmål | QR-kode og antall stemmer |
-| 4–5 | Lukk avstemning | **Rett til debattreglene** (format, taletider og spillekort) |
+| 4 | Lukk avstemning | **Rett til debattreglene** (format, taletider og spillekort) |
+| 5 | Debattintro | «Velkommen til I-Squared» i fullskjerm med sangen innbakt i videoen, deretter **tilbake til debattreglene** |
 | 6 | Introvideo Lag Nord | Video i fullskjerm med Lag Nords sang. Sangen fades ned når videoen er ferdig, og skjermen går **tilbake til debattreglene** |
 | 7 | Introvideo Lag Sør | Video i fullskjerm med Lag Sørs sang (fades ned), **deretter påstand 1** |
 | 8 | Ekstravideo påstand 1 | Video, **tilbake til påstand 1** |

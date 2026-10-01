@@ -100,6 +100,7 @@ window.ISQ_CONFIG = {
     north: 'media/images/lagnord.jpg',
     south: 'media/images/lagsør.jpg',
     videos: {
+      introDebate: 'media/video/introdebatt.mp4',
       introNorth: 'media/video/Introvideonord.mp4',
       introSouth: 'media/video/Introvideosør.mp4',
       extra1: 'media/video/ekstravideopåstand1.mp4',
@@ -129,6 +130,7 @@ writeFileSync(
   hero.jpg                    -> media/images/hero.jpg
   Bilder/lagnord.jpg          -> media/images/lagnord.jpg
   Bilder/lagsør.jpg           -> media/images/lagsør.jpg
+  introdebatt.mp4             -> media/video/introdebatt.mp4 (debattintro med innbakt sang)
   Video/Introvideonord.mp4    -> media/video/Introvideonord.mp4
   Video/Introvideosør.mp4     -> media/video/Introvideosør.mp4
   Video/ekstravideopåstand1-3 -> media/video/ekstravideopåstand1.mp4 (osv.)

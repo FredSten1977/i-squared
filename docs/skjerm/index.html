@@ -1254,6 +1254,8 @@ var ISQ_Config = (function () {
    * returnTo: hvor skjermen går når videoen er ferdig (null = visningen før videoen).
    */
   var VIDEOS = [
+    // Debattintroen har sangen innbakt (ingen egen soundtrack), og går tilbake til debattreglene
+    { key: 'introDebate', label: 'Debattintro', file: 'media/video/introdebatt.mp4', returnTo: { view: 'rules' } },
     { key: 'introNorth', label: 'Introvideo Lag Nord', file: 'media/video/Introvideonord.mp4', team: 'north', returnTo: null },
     { key: 'introSouth', label: 'Introvideo Lag Sør', file: 'media/video/Introvideosør.mp4', team: 'south', returnTo: { view: 'statement', statementNo: 1 } },
     {

@@ -32,6 +32,7 @@ test('kjøreplanen følger innslagets 22 steg i riktig rekkefølge', () => {
     'mainq',
     'main-open',
     'main-close',
+    'intro-d',
     'intro-n',
     'intro-s',
     ...stmt(1),

@@ -7,7 +7,8 @@
  * enkeltknappene, men rekkefølgen under er standardgangen i innslaget:
  *
  *   1  Forside (hero)                         2  Hovedspørsmål
- *   3  Åpne avstemning hovedspørsmål          4–5 Lukk → debattregler
+ *   3  Åpne avstemning hovedspørsmål          4  Lukk → debattregler
+ *   5  Debattintro (I-Squared) → tilbake til regler
  *   6  Introvideo Nord → tilbake til regler
  *   7  Introvideo Sør → påstand 1
  *   For hver påstand n (1–3):
@@ -61,10 +62,11 @@ var ISQ_StateMachine = (function () {
     add('hero', '1', 'Forside', 'intro', [['setView', { view: 'hero' }]]);
     add('mainq', '2', 'Vis hovedspørsmål', 'intro', [['setView', { view: 'mainQuestion' }]]);
     add('main-open', '3', 'Åpne avstemning: hovedspørsmål', 'main_poll_before', [['openPoll', { pollId: 'main-before', showQr: true }]]);
-    add('main-close', '4–5', 'Lukk avstemning → debattregler', 'team_introduction', [
+    add('main-close', '4', 'Lukk avstemning → debattregler', 'team_introduction', [
       ['closePoll', { pollId: 'main-before' }],
       ['setView', { view: 'rules' }]
     ]);
+    add('intro-d', '5', 'Debattintro (→ regler)', 'team_introduction', [['playVideo', { key: 'introDebate' }]]);
     add('intro-n', '6', 'Introvideo Lag Nord (→ regler)', 'team_introduction', [['playVideo', { key: 'introNorth' }]]);
     add('intro-s', '7', 'Introvideo Lag Sør (→ påstand 1)', 'team_introduction', [['playVideo', { key: 'introSouth' }]]);
     for (var n = 1; n <= 3; n++) {

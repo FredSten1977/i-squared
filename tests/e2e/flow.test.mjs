@@ -23,6 +23,7 @@ const MEDIA = [
   ['hero.jpg', 'images/hero.jpg'],
   ['lagnord.jpg', 'images/lagnord.jpg'],
   ['lagsor.jpg', 'images/lagsør.jpg'],
+  ['testvideo.webm', 'video/introdebatt.mp4'],
   ['testvideo.webm', 'video/Introvideonord.mp4'],
   ['testvideo.webm', 'video/Introvideosør.mp4'],
   ['testvideo.webm', 'video/ekstravideopåstand1.mp4'],
@@ -166,11 +167,20 @@ test('innslaget steg 1–22: NESTE-knappen på mobil styrer storskjermen', { tim
   await voteAll(['MODERNISERING', 'POWERPOINT', 'USIKKER']);
   await shot('qr-hovedsporsmal');
 
-  // 4–5. Lukkes → rett til debattreglene
-  await next('4–5. Lukk avstemning → debattregler');
+  // 4. Lukkes → rett til debattreglene
+  await next('4. Lukk avstemning → debattregler');
   await onScreen('v-rules', 'debattregler etter lukket hovedspørsmål');
   assert.match(await text(display, '#rulesFormat'), /Kryssforhør/);
   await shot('debattregler');
+
+  // 5. Debattintro (sangen ligger i videoen) → tilbake til debattreglene
+  await next('5. Debattintro');
+  await onScreen('v-video');
+  await waitFor(async () => display.evaluate(() => !document.getElementById('player').paused), { message: 'debattintroen spilles' });
+  assert.equal(await display.locator('#videoMissing.show').count(), 0, 'debattintro-filen finnes');
+  assert.equal(await display.evaluate(() => document.getElementById('player').muted), false, 'debattintroen har egen lyd');
+  assert.equal(await display.evaluate(() => document.getElementById('soundtrack').paused), true, 'ingen egen sang til debattintroen');
+  await onScreen('v-rules', 'tilbake til regler etter debattintro');
 
   // 6. Introvideo Nord i fullskjerm → tilbake til debattregler når ferdig
   await next('6. Introvideo Lag Nord');

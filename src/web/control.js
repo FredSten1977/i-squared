@@ -573,9 +573,10 @@
         { cls: 'gold', sub: 'Hovedspørsmål • ' + state.polls['main-before'].count + ' stemmer' }
       ) +
       btn('4. Lukk avstemning', 'closePoll', { pollId: 'main-before' }, { disabled: state.polls['main-before'].status !== 'open', sub: '→ debattregler' }) +
-      btn('5. Debattregler', 'setView', { view: 'rules' }) +
+      btn('5. Debattintro', 'playVideo', { key: 'introDebate' }, { cls: 'gold', sub: '→ tilbake til regler' }) +
+      btn('Debattregler', 'setView', { view: 'rules' }) +
       btn('6. Introvideo Nord', 'playVideo', { key: 'introNorth' }, { cls: 'blue', sub: '→ tilbake til regler' }) +
-      btn('7. Introvideo Sør', 'playVideo', { key: 'introSouth' }, { cls: 'red span2', sub: '→ påstand 1' }) +
+      btn('7. Introvideo Sør', 'playVideo', { key: 'introSouth' }, { cls: 'red', sub: '→ påstand 1' }) +
       '</div>';
 
     h += '<h2>Velg påstand</h2><div class="seg">';

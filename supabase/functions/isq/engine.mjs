@@ -65,6 +65,8 @@ var ISQ_Config = (function () {
    * returnTo: hvor skjermen går når videoen er ferdig (null = visningen før videoen).
    */
   var VIDEOS = [
+    // Debattintroen har sangen innbakt (ingen egen soundtrack), og går tilbake til debattreglene
+    { key: 'introDebate', label: 'Debattintro', file: 'media/video/introdebatt.mp4', returnTo: { view: 'rules' } },
     { key: 'introNorth', label: 'Introvideo Lag Nord', file: 'media/video/Introvideonord.mp4', team: 'north', returnTo: null },
     { key: 'introSouth', label: 'Introvideo Lag Sør', file: 'media/video/Introvideosør.mp4', team: 'south', returnTo: { view: 'statement', statementNo: 1 } },
     {
@@ -694,7 +696,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = ISQ_Valida
  * enkeltknappene, men rekkefølgen under er standardgangen i innslaget:
  *
  *   1  Forside (hero)                         2  Hovedspørsmål
- *   3  Åpne avstemning hovedspørsmål          4–5 Lukk → debattregler
+ *   3  Åpne avstemning hovedspørsmål          4  Lukk → debattregler
+ *   5  Debattintro (I-Squared) → tilbake til regler
  *   6  Introvideo Nord → tilbake til regler
  *   7  Introvideo Sør → påstand 1
  *   For hver påstand n (1–3):
@@ -748,10 +751,11 @@ var ISQ_StateMachine = (function () {
     add('hero', '1', 'Forside', 'intro', [['setView', { view: 'hero' }]]);
     add('mainq', '2', 'Vis hovedspørsmål', 'intro', [['setView', { view: 'mainQuestion' }]]);
     add('main-open', '3', 'Åpne avstemning: hovedspørsmål', 'main_poll_before', [['openPoll', { pollId: 'main-before', showQr: true }]]);
-    add('main-close', '4–5', 'Lukk avstemning → debattregler', 'team_introduction', [
+    add('main-close', '4', 'Lukk avstemning → debattregler', 'team_introduction', [
       ['closePoll', { pollId: 'main-before' }],
       ['setView', { view: 'rules' }]
     ]);
+    add('intro-d', '5', 'Debattintro (→ regler)', 'team_introduction', [['playVideo', { key: 'introDebate' }]]);
     add('intro-n', '6', 'Introvideo Lag Nord (→ regler)', 'team_introduction', [['playVideo', { key: 'introNorth' }]]);
     add('intro-s', '7', 'Introvideo Lag Sør (→ påstand 1)', 'team_introduction', [['playVideo', { key: 'introSouth' }]]);
     for (var n = 1; n <= 3; n++) {
