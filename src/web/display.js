@@ -838,8 +838,8 @@
       $('muted').classList.add('show');
     });
   }
-  /** Fader sangen ned (standard 3 sekunder) og stopper den. */
-  function fadeOutSoundtrack() {
+  /** Fader sangen ned (standard 3 sekunder) og stopper den. @param {number} [ms] varighet på fadingen */
+  function fadeOutSoundtrack(ms) {
     if (!soundtrackOn) return;
     soundtrackOn = false;
     clearInterval(fadeTimer);
@@ -847,10 +847,11 @@
       soundtrack.pause();
       return;
     }
+    var dur = ms || FADE_MS;
     var start = soundtrack.volume;
     var t0 = Date.now();
     fadeTimer = setInterval(function () {
-      var k = Math.min(1, (Date.now() - t0) / FADE_MS);
+      var k = Math.min(1, (Date.now() - t0) / dur);
       soundtrack.volume = Math.max(0, start * (1 - k));
       if (k >= 1) {
         clearInterval(fadeTimer);
@@ -858,6 +859,23 @@
       }
     }, 50);
   }
+
+  /**
+   * Starter fadingen FØR videoen (eller sangen) er slutt, slik at sangen er helt nede
+   * akkurat idet videoen er ferdig – også når sangen er like lang som videoen.
+   * Korte videoer (tester) får en tilsvarende kortere forsprang.
+   */
+  function checkSoundtrackFade() {
+    if (!soundtrackOn || !FADE_MS || soundtrack.paused) return;
+    var left = Infinity;
+    if (isFinite(player.duration) && player.duration > 0) left = player.duration - player.currentTime;
+    if (isFinite(soundtrack.duration) && soundtrack.duration > 0) left = Math.min(left, soundtrack.duration - soundtrack.currentTime);
+    var total = isFinite(player.duration) && player.duration > 0 ? player.duration : Infinity;
+    var lead = Math.min(FADE_MS / 1000, total / 2);
+    if (left <= lead) fadeOutSoundtrack(Math.max(200, left * 1000));
+  }
+  player.addEventListener('timeupdate', checkSoundtrackFade);
+  soundtrack.addEventListener('timeupdate', checkSoundtrackFade);
 
   function tryPlay() {
     player.muted = !audioUnlocked || (soundtrackOn && !VIDEO_SOUND_WITH_SOUNDTRACK);

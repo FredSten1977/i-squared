@@ -62,7 +62,7 @@ Du kan når som helst **overstyre manuelt**:
 | 3 | Åpne avstemning: hovedspørsmål | QR-kode og antall stemmer |
 | 4 | Lukk avstemning | **Rett til debattreglene** (format, taletider og spillekort) |
 | 5 | Debattintro | «Velkommen til I-Squared» i fullskjerm med sangen innbakt i videoen, deretter **tilbake til debattreglene** |
-| 6 | Introvideo Lag Nord | Video i fullskjerm med Lag Nords sang. Sangen fades ned når videoen er ferdig, og skjermen går **tilbake til debattreglene** |
+| 6 | Introvideo Lag Nord | Video i fullskjerm med Lag Nords sang. Sangen fades ned de siste 3 sekundene av videoen, og skjermen går **tilbake til debattreglene** |
 | 7 | Introvideo Lag Sør | Video i fullskjerm med Lag Sørs sang (fades ned), **deretter påstand 1** |
 | 8 | Ekstravideo påstand 1 | Video, **tilbake til påstand 1** |
 | 9 | Åpne før-avstemning påstand 1 | QR-kode |

@@ -198,16 +198,20 @@ test('innslaget steg 1–22: NESTE-knappen på mobil styrer storskjermen', { tim
   assert.match(s1.src, /music\/introlagnord\.mp3$/);
   assert.equal(s1.volume, 1);
   assert.equal(s1.videoMuted, true);
+  // Sangen fades ned FØR videoen er slutt (volumet synker mens videoen ennå spilles) …
+  await display.evaluate(() => {
+    const a = document.getElementById('soundtrack');
+    const v = document.getElementById('player');
+    window.__fadeBeforeEnd = false;
+    a.addEventListener('volumechange', () => {
+      if (a.volume < 0.95 && !v.ended && !v.paused) window.__fadeBeforeEnd = true;
+    });
+  });
   await onScreen('v-rules', 'tilbake til regler etter introvideo Nord');
-  // Videoen er ferdig: sangen fades ned (volumet synker) og stopper
-  await waitFor(
-    async () => {
-      const x = await song();
-      return x.playing && x.volume > 0 && x.volume < 0.95;
-    },
-    { message: 'sangen fades ned' }
-  );
-  await waitFor(async () => !(await song()).playing, { message: 'sangen stopper etter fade' });
+  assert.equal(await display.evaluate(() => window.__fadeBeforeEnd), true, 'fadingen starter før videoen er ferdig');
+  // … og er helt nede og stoppet når videoen er ferdig
+  await waitFor(async () => !(await song()).playing, { timeout: 3000, message: 'sangen stopper etter fade' });
+  assert.ok((await song()).volume < 0.2, 'sangen er fadet ned, ikke kuttet');
 
   // 7. Introvideo Sør → påstand 1
   await next('7. Introvideo Lag Sør');
